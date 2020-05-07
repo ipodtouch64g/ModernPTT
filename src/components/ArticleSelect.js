@@ -30,7 +30,6 @@ export default function ArticleSelect(props) {
 		}
 	}));
 	
-	const setIndex = props.setIndex;
 	const classes = useStyles();
 	const info = useArticleBoardInfoContext();
 	const BotContext = useBotContext();
@@ -43,11 +42,12 @@ export default function ArticleSelect(props) {
 		) {
 			// generate list items
 			let res = info.articleList.map(item => {
-				return ArticleItem({ item, info, BotContext,setIndex });
+				return ArticleItem({ item, info, BotContext});
       });
 			setArticleItems(res);
 		}
 	}, [info]);
+
 
 	const handleLoadMore = () => {
 		// prevent default action

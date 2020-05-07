@@ -7,6 +7,7 @@ import { Grid } from "@material-ui/core";
 import SwipeableViews from 'react-swipeable-views';
 import ArticleDisplay from './ArticleDisplay';
 import ArticleSelect from './ArticleSelect';
+import { useArticleBoardInfoContext } from "./ArticleBoardInfoContext";
 
 
 export default function ArticleArea() {
@@ -21,16 +22,18 @@ export default function ArticleArea() {
 			width: "80%"
 		},
 
-	}));
+  }));
+  const info = useArticleBoardInfoContext(); 
   const classes = useStyles();
-  const [index,setIndex] = useState(0);
+
   const handleChangeIndex = (i) =>{
-    setIndex(i);
+    
+    info.setIndex(i);
   }
   return(
-    <SwipeableViews index={index} onChangeIndex={handleChangeIndex}>
-      <ArticleSelect setIndex={setIndex}/>
-      <ArticleDisplay setIndex={setIndex}/>
+    <SwipeableViews index={info.index} onChangeIndex={handleChangeIndex}>
+      <ArticleSelect/>
+      <ArticleDisplay/>
     </SwipeableViews>
     
   );

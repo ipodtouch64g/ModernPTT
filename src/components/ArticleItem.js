@@ -11,7 +11,6 @@ export default function ArticleItem(props) {
 	let item = props.item;
 	let info = props.info;
 	let BotContext = props.BotContext;
-	let setIndex = props.setIndex;
 
 	const parseArticle = article => {
 		let articleContent = {
@@ -25,7 +24,7 @@ export default function ArticleItem(props) {
 		};
 		let content = article.content;
 		// content starts from index 4
-		for(let i=4,state=0;i<content.length;i++) {
+		for(let i=4,state=0,floor=1;i<content.length;i++) {
 			let s = content[i].str; 
 			if(state===0){
 				if(s.startsWith("※ 發信站: 批踢踢實業坊(ptt.cc)")) {
@@ -40,11 +39,12 @@ export default function ArticleItem(props) {
 				let commentLine = {type:"",author:"",text:"",timestamp:""};
 				// find out whether it is a normal comment
 				if(s.match(/[推噓→] [\w\d]+: .+/)) {
+					commentLine.floor = floor++;
 					commentLine.type = s[0];
 					commentLine.timestamp = s.substring(s.length-11);
-					let ss = s.split(":");
-					commentLine.author = ss[0].substring(2);
-					commentLine.text = ss[1].substring(1,ss[1].length-11);
+					let firstColon = s.indexOf(":");
+					commentLine.author = s.substring(2,firstColon);
+					commentLine.text = s.substring(firstColon+1,s.length-11);
 				} else {
 					commentLine.text = s;
 				}
@@ -69,7 +69,7 @@ export default function ArticleItem(props) {
 		// parse article
 		info.setArticleContent(parseArticle(res));
 		// info.setArticleContent((res));
-		setIndex(1);
+		info.setIndex(1);
 		return true;
 	};
 

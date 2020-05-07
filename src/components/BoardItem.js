@@ -21,10 +21,10 @@ export default function BoardItem(props) {
 		let res = await BotContext.executeCommand({type:"select",arg:query});
 		if(!res) return false;
 		console.log('handleclick',res)
-
 		
 		info.setArticleList(res);
 		info.setBoardName(item.name)
+		info.setIndex(0);
 		return true;
 	}
 

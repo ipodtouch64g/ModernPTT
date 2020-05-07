@@ -6,14 +6,16 @@ const useArticleBoardInfo = () => {
 	const [boardName, setBoardName] = useState("");
   const [articleContent, setArticleContent] = useState({});
   const [articleList, setArticleList] = useState([]);
-
+  const [index, setIndex] = useState(0);
 	const info = {
 		boardName: boardName,
 		setBoardName: setBoardName,
 		articleContent: articleContent,
 		setArticleContent: setArticleContent,
 		articleList: articleList,
-    	setArticleList: setArticleList,
+		setArticleList: setArticleList,
+		index: index,
+		setIndex :setIndex,
 	};
 
 	return info;
