@@ -1,12 +1,28 @@
 import { useState } from "react";
 import constate from "constate";
+import { Article } from "./utils/article";
+import { useBotContext } from "./BotContext";
 
 const useArticleBoardInfo = () => {
-	// Todo : can config this
+	const BotContext = useBotContext();
 	const [boardName, setBoardName] = useState("");
-  const [articleContent, setArticleContent] = useState({});
-  const [articleList, setArticleList] = useState([]);
-  const [index, setIndex] = useState(0);
+	const [articleContent, setArticleContent] = new useState({
+		info: {
+			id: "",
+			aid: "",
+			author: "",
+			boardname: "",
+			timestamp: "",
+			commentStartIndex: -1,
+			title: "",
+			ip: ""
+		},
+		content: [],
+		comment: []
+	});
+
+	const [articleList, setArticleList] = useState([]);
+	const [index, setIndex] = useState(0);
 	const info = {
 		boardName: boardName,
 		setBoardName: setBoardName,
@@ -15,7 +31,7 @@ const useArticleBoardInfo = () => {
 		articleList: articleList,
 		setArticleList: setArticleList,
 		index: index,
-		setIndex :setIndex,
+		setIndex: setIndex
 	};
 
 	return info;

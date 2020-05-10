@@ -6,7 +6,6 @@ import ListItemText from "@material-ui/core/ListItemText";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import Typography from "@material-ui/core/Typography";
 import { Article } from "ptt-client/dist/sites/ptt/model";
-import ArticleItem from "./ArticleItem";
 
 export default function BoardItem(props) {
 

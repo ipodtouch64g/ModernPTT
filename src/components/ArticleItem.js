@@ -5,72 +5,25 @@ import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import Typography from "@material-ui/core/Typography";
-import { Article } from "ptt-client/dist/sites/ptt/model";
+import {parseArticle,refreshArticleComment} from "./utils/article"
 
 export default function ArticleItem(props) {
+
 	let item = props.item;
 	let info = props.info;
 	let BotContext = props.BotContext;
 
-	const parseArticle = article => {
-		let articleContent = {
-			author: article.author,
-			boardname: article.boardname,
-			timestamp: article.timestamp,
-			content: [],
-			ip: "",
-			comment: [],
-			title: article.title,
-		};
-		let content = article.content;
-		// content starts from index 4
-		for(let i=4,state=0,floor=1;i<content.length;i++) {
-			let s = content[i].str; 
-			if(state===0){
-				if(s.startsWith("※ 發信站: 批踢踢實業坊(ptt.cc)")) {
-					state = 1;
-					articleContent.ip = s.substring(27);
-					i++;
-				} else {
-					articleContent.content.push(s);
-				}
-			} else {
-				// type : '推','噓','→'
-				let commentLine = {type:"",author:"",text:"",timestamp:""};
-				// find out whether it is a normal comment
-				if(s.match(/[推噓→] [\w\d]+: .+/)) {
-					commentLine.floor = floor++;
-					commentLine.type = s[0];
-					commentLine.timestamp = s.substring(s.length-11);
-					let firstColon = s.indexOf(":");
-					commentLine.author = s.substring(2,firstColon);
-					commentLine.text = s.substring(firstColon+1,s.length-11);
-				} else {
-					commentLine.text = s;
-				}
-				articleContent.comment.push(commentLine);
-			}
-		}
-		return articleContent
-	};
-
 	const handleClick = async () => {
+		// handle deleted article
+		if(item.title.startsWith("(本文已被刪除)")) return;
 		console.log("article item click:", info, item, BotContext);
-		let query = BotContext.bot
-			.select(Article)
-			.where("boardname", item.boardname)
-			.where("id", item.id);
-		let res = await BotContext.executeCommand({
-			type: "content",
-			arg: query
-		});
-		if (!res) return false;
-		console.log("handleclick", res);
-		// parse article
-		info.setArticleContent(parseArticle(res));
-		// info.setArticleContent((res));
-		info.setIndex(1);
-		return true;
+		try {
+			let articleContent = await parseArticle(item,BotContext);
+			info.setArticleContent(articleContent);
+			info.setIndex(1);
+		} catch(err) {
+			console.log(err);
+		}
 	};
 
 	return (

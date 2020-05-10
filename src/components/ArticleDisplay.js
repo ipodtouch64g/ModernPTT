@@ -11,6 +11,7 @@ import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import { List, ListItem, ListItemText } from "@material-ui/core";
+import SendComment from "./SendComment";
 
 export default function ArticleDisplay(props) {
 	const useStyles = makeStyles(theme => ({
@@ -34,7 +35,7 @@ export default function ArticleDisplay(props) {
 		goback: {
 			width: "4vw",
 			top: 0,
-			position:'absolute',
+			position: "absolute",
 			zIndex: 1001
 		},
 		info: {},
@@ -75,6 +76,10 @@ export default function ArticleDisplay(props) {
 		},
 		commentlist_timestamp: {
 			flexBasis: "10%"
+		},
+
+		lit: {
+			whiteSpace: "pre"
 		}
 	}));
 
@@ -82,16 +87,15 @@ export default function ArticleDisplay(props) {
 	const article = info.articleContent;
 	const classes = useStyles();
 
-	// Todo : image
+	// Todo : 1. 排版會跑掉
+	//		  2. 自動開圖
+	//
 	const genContentList = content => {
 		if (content) {
 			let res = content.map(item => {
 				return (
 					<ListItem disableGutters={true} className={classes.lit}>
-						<ListItemText
-							className={classes.lit_text}
-							primary={item}
-						/>
+						<ListItemText primary={item} />
 					</ListItem>
 				);
 			});
@@ -111,26 +115,36 @@ export default function ArticleDisplay(props) {
 						className={classes.commentlist_item}
 						key={item.floor}
 					>
-						<ListItemText
-							className={classes.commentlist_type}
-							primary={item.type}
-						/>
-
-						<ListItemText
-							className={classes.commentlist_author}
-							primary={item.author}
-						/>
+						{item.type ? (
+							<ListItemText
+								className={classes.commentlist_type}
+								primary={item.type}
+							/>
+						) : (
+							""
+						)}
+						{item.author ? (
+							<ListItemText
+								className={classes.commentlist_author}
+								primary={item.author}
+							/>
+						) : (
+							""
+						)}
 
 						<ListItemText
 							className={classes.commentlist_text}
 							primary={item.text}
 						/>
-
-						<ListItemText
-							className={classes.commentlist_timestamp}
-							primary={item.floor + "F"}
-							secondary={item.timestamp}
-						/>
+						{item.timestamp ? (
+							<ListItemText
+								className={classes.commentlist_timestamp}
+								primary={item.floor + "F"}
+								secondary={item.timestamp}
+							/>
+						) : (
+							""
+						)}
 					</ListItem>
 				);
 			});
@@ -140,9 +154,10 @@ export default function ArticleDisplay(props) {
 	};
 
 	const ref = React.createRef();
+
 	// go back to top when load new articleContent
 	useEffect(() => {
-		if(info.index === 1) {
+		if (info.index === 1) {
 			ref.current.scrollTop = 0;
 		}
 	}, [info.index]);
@@ -165,21 +180,21 @@ export default function ArticleDisplay(props) {
 			<Grid container className={classes.top}>
 				<Grid container className={classes.info}>
 					<Typography className={classes.author} variant={"body1"}>
-						{article.author}
+						{article.info.author}
 					</Typography>
 
 					<Typography variant={"h5"} className={classes.titleText}>
-						{article.title}
+						{article.info.title}
 					</Typography>
 
 					<Typography className={classes.boardName} variant={"body2"}>
-						{article.boardname}
+						{article.info.boardname}
 					</Typography>
 					<Typography className={classes.timestamp} variant={"body2"}>
-						・{article.timestamp}
+						・{article.info.timestamp}
 					</Typography>
 					<Typography className={classes.ip} variant={"body2"}>
-						・來自：{article.ip}
+						・來自：{article.info.ip}
 					</Typography>
 				</Grid>
 			</Grid>
@@ -189,6 +204,10 @@ export default function ArticleDisplay(props) {
 
 			<Grid container className={classes.comment}>
 				{genCommentList(article.comment)}
+			</Grid>
+
+			<Grid container className={classes.sendComment}>
+				<SendComment />
 			</Grid>
 		</Grid>
 	);

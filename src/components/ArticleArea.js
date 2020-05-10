@@ -27,7 +27,6 @@ export default function ArticleArea() {
   const classes = useStyles();
 
   const handleChangeIndex = (i) =>{
-    
     info.setIndex(i);
   }
   return(
