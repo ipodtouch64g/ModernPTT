@@ -45,7 +45,8 @@ import { URL2AID } from "./decode";
 			type: "content",
 			arg: query
 		});
-		if (!res) return Promise.reject('getArticleResponse err.');
+        if (!res) return Promise.reject('getArticleResponse err.');
+        console.log(res);
 		return res;
     }
     

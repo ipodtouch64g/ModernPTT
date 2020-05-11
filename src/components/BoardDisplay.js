@@ -18,7 +18,8 @@ export default function BoardDisplay(props) {
 			justifyContent : 'center',
 			maxHeight: "80vh",
 			height: "80vh",
-			overflow: "auto"
+			overflow: "auto",
+			alignContent: "flex-start",
 		},
 		skeleton: {
 			fontSize: "40px",
