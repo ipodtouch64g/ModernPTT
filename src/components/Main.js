@@ -13,8 +13,9 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 import { UserProvider } from "./UserContext";
 import { BotProvider } from "./BotContext";
 import { ArticleBoardInfoProvider } from "./ArticleBoardInfoContext";
-import Hidden from '@material-ui/core/Hidden';
-
+import  MySnackbar  from "./MySnackbar";
+import Hidden from "@material-ui/core/Hidden";
+import {ProgressProvider} from "./ProgressContext";
 import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
 
 const theme = createMuiTheme({
@@ -27,7 +28,7 @@ const theme = createMuiTheme({
 		},
 		h5: {
 			fontSize: "1rem",
-			fontWeight: "bold",
+			fontWeight: "bold"
 		}
 	}
 });
@@ -35,33 +36,36 @@ const theme = createMuiTheme({
 export default function Main() {
 	return (
 		<UserProvider>
-			<BotProvider>
-				<ArticleBoardInfoProvider>
-				<ThemeProvider theme={theme}>
-					<Container
-						component="main"
-						maxWidth="lg"
-						disableGutters="true"
-					>
-						<CssBaseline />
-						<Login />
-						<Grid container>
-							<Grid item xs={12}>
-								<SearchBar />
-							</Grid>
-							<Hidden xsDown>
-							<Grid item  sm={3} direction="column">
-								<BoardArea />
-							</Grid>
-							</Hidden>
-							<Grid item xs={12} sm={9} >
-								<ArticleArea />
-							</Grid>
-						</Grid>
-					</Container>
-				</ThemeProvider>
-				</ArticleBoardInfoProvider>
-			</BotProvider>
+			<ProgressProvider>
+				<BotProvider>
+					<ArticleBoardInfoProvider>
+						<ThemeProvider theme={theme}>
+							<Container
+								component="main"
+								maxWidth="lg"
+								disableGutters="true"
+							>
+								<CssBaseline />
+								<Login />
+								<Grid container>
+									<Grid item xs={12}>
+										<SearchBar />
+									</Grid>
+									<Hidden xsDown>
+										<Grid item sm={3} direction="column">
+											<BoardArea />
+										</Grid>
+									</Hidden>
+									<Grid item xs={12} sm={9}>
+										<ArticleArea />
+									</Grid>
+									<MySnackbar />
+								</Grid>
+							</Container>
+						</ThemeProvider>
+					</ArticleBoardInfoProvider>
+				</BotProvider>
+			</ProgressProvider>
 		</UserProvider>
 	);
 }

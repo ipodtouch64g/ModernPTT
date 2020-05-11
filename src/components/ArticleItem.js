@@ -18,9 +18,12 @@ export default function ArticleItem(props) {
 		if(item.title.startsWith("(本文已被刪除)")) return;
 		console.log("article item click:", info, item, BotContext);
 		try {
+			let t1 = performance.now();
 			let articleContent = await parseArticle(item,BotContext);
-			info.setArticleContent(articleContent);
 			info.setIndex(1);
+			info.setArticleContent(articleContent);
+			let t2 = performance.now();
+			console.log("articleContent load time",t2-t1);
 		} catch(err) {
 			console.log(err);
 		}

@@ -14,7 +14,7 @@ export default function ArticleArea() {
   const useStyles = makeStyles(theme => ({
 		root: {
 			maxHeight: "80vh",
-			height: "40vh",
+			
 			overflow: "auto"
 		},
 		skeleton: {

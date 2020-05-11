@@ -10,11 +10,11 @@ import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Backdrop from "@material-ui/core/Backdrop";
-import Snackbar from "@material-ui/core/Snackbar";
-import MuiAlert from "@material-ui/lab/Alert";
-import CircularProgress from "@material-ui/core/CircularProgress";
 import { useUserContext } from "./UserContext";
 import { useBotContext } from "./BotContext";
+import { useProgressContext } from "./ProgressContext";
+import { CircularProgress } from "@material-ui/core";
+
 import { useForm } from "react-hook-form";
 import Cookies from "universal-cookie";
 
@@ -24,7 +24,7 @@ const useStyles = makeStyles(theme => ({
 		alignItems: "center",
 		flexDirection: "column"
 	},
-	paper: {
+	paperform: {
 		width: "400px",
 		margin: theme.spacing(8, 4),
 		display: "flex",
@@ -41,6 +41,17 @@ const useStyles = makeStyles(theme => ({
 		position: "absolute",
 		marginTop: "25vh",
 		zIndex: theme.zIndex.drawer + 2
+	},
+	paperreconnect: {
+		padding:"12px",
+		minWidth: "20vw",
+		height: "15vh",
+		display: "flex",
+		flexDirection: "column",
+	},
+	reconnectText:{},
+	reconnectButton:{
+		alignSelf:"flex-end"
 	},
 	form: {
 		width: "80%",
@@ -66,7 +77,7 @@ export default function Login() {
 
 	const { user, setUser } = useUserContext();
 	const BotContext = useBotContext();
-
+	const { setIsSnackbarOpen, setSnackbarContent } = useProgressContext();
 	const { register, handleSubmit } = useForm();
 
 	const onSubmit = async (data, e) => {
@@ -97,7 +108,11 @@ export default function Login() {
 				return true;
 			} else {
 				console.log("login fail");
-				setOpenErrorBar(true);
+				setSnackbarContent({
+					severity: "error",
+					text: "帳密輸入錯誤！！"
+				});
+				setIsSnackbarOpen(true);
 				setOpenForm(true);
 				setOpenLoadingCircle(false);
 				return false;
@@ -105,11 +120,13 @@ export default function Login() {
 		},
 		[BotContext]
 	);
-
+	const handleReconnect = () => {
+		BotContext.bot.reconnect();
+	}
 	const [openBackDrop, setOpenBackDrop] = useState(!user);
-	const [openErrorBar, setOpenErrorBar] = useState(false);
 	const [openLoadingCircle, setOpenLoadingCircle] = useState(false);
 	const [openForm, setOpenForm] = useState(true);
+	const [openReconnect, setOpenReconnect] = useState(false);
 
 	useEffect(() => {
 		async function tryLogin() {
@@ -118,30 +135,23 @@ export default function Login() {
 		console.log("botState:", BotContext.botState);
 		console.log("prev botState:", BotContext.prevBotState);
 		if (user) {
-				if(BotContext.prevBotState === undefined) return;
-				if (BotContext.botState.connect && !BotContext.prevBotState.connect) {
-					tryLogin();
-				} else if (
-					BotContext.prevBotState.connect &&
-					!BotContext.botState.connect
-				) {
-					// disconnected
-					setOpenLoadingCircle(true);
-				}
-			
+			if (BotContext.prevBotState === undefined) return;
+			if (
+				BotContext.botState.connect &&
+				!BotContext.prevBotState.connect
+			) {
+				setOpenReconnect(false);
+				tryLogin();
+			} else if (
+				BotContext.prevBotState.connect &&
+				!BotContext.botState.connect
+			) {
+				// disconnected
+				setOpenBackDrop(true);
+				setOpenReconnect(true);
+			}
 		}
 	}, [user, BotContext.botState, BotContext.prevBotState, loginCallback]);
-
-	function Alert(props) {
-		return <MuiAlert elevation={6} variant="filled" {...props} />;
-	}
-
-	const handleErrorBarClose = (event, reason) => {
-		if (reason === "clickaway") {
-			return;
-		}
-		setOpenErrorBar(false);
-	};
 
 	return (
 		<Grid container component="main" className={classes.root}>
@@ -163,8 +173,16 @@ export default function Login() {
 			<Backdrop className={classes.backdrop} open={openBackDrop}>
 				<Grid container component="main" className={classes.root}>
 					<CssBaseline />
+					{openReconnect && (
+						<Paper className={classes.paperreconnect}>
+							<Typography variant="body1" className={classes.reconnectText}>您斷線了</Typography>
+							<Button variant="contained" color="secondary" className={classes.reconnectButton} onClick={handleReconnect}>
+								重新連線
+							</Button>
+						</Paper>
+					)}
 					{openForm && (
-						<Paper className={classes.paper}>
+						<Paper className={classes.paperform}>
 							{/* <Avatar variant="square" className={classes.large} src="logo.png"/> */}
 							<Typography
 								component="h4"
@@ -224,13 +242,6 @@ export default function Login() {
 					)}
 				</Grid>
 			</Backdrop>
-			<Snackbar
-				open={openErrorBar}
-				autoHideDuration={6000}
-				onClose={handleErrorBarClose}
-			>
-				<Alert severity="error">帳密輸入錯誤歐!</Alert>
-			</Snackbar>
 		</Grid>
 	);
 }

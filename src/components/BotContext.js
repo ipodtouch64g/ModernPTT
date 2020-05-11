@@ -2,13 +2,27 @@ import { useState } from "react";
 import constate from "constate";
 import Ptt from "ptt-client";
 import usePrev from "./usePrev";
+import { useProgressContext } from "./ProgressContext";
 
 const useBot = () => {
-	const ptt = new Ptt();
-	const [bot] = useState(ptt);
-
+	
+	console.log('new useBot()')
+	const [bot] = useState(new Ptt());
+	
 	const [botState, setBotState] = useState(bot.state);
 	const prevBotState = usePrev(botState);
+
+	const { setIsSnackbarOpen, setSnackbarContent } = useProgressContext();
+
+	bot.on("connect", () => {
+		console.log("bot connected");
+		setBotState(bot.state);
+	});
+
+	bot.on("disconnect", () => {
+		console.log("bot disconnected");
+		setBotState(bot.state);
+	});
 
 	let busy = false;
 
@@ -25,6 +39,8 @@ const useBot = () => {
 	// command = {type : "login"|"select"|"content"|"comment", arg : query | userObject}
 	const executeCommand = async command => {
 		if (busy) {
+			setSnackbarContent({severity:'info',text:'等！'})
+			setIsSnackbarOpen(true)
 			return Promise.reject('bot is busy!');
 		}
 		busy = true;
@@ -68,17 +84,7 @@ const useBot = () => {
 			return Promise.reject(err);
 		}
 	};
-
-	bot.on("connect", () => {
-		console.log("bot connected");
-		setBotState(bot.state);
-	});
-
-	bot.on("disconnect", () => {
-		console.log("bot disconnected");
-		setBotState(bot.state);
-	});
-
+	
 	return {
 		bot: bot,
 		botState: botState,

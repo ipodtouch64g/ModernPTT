@@ -46,6 +46,6 @@
   },
   "devDependencies": {
     "gh-pages": "^2.2.0"
-  }
- 
+  },
+  "homepage" : "https://ipodtouch64g.github.io/ModernPTT/"
 }

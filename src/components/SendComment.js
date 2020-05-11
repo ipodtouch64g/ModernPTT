@@ -14,7 +14,8 @@ import Button from "@material-ui/core/Button";
 import PlayArrowIcon from "@material-ui/icons/PlayArrow";
 import { useForm, Controller } from "react-hook-form";
 import InputLabel from "@material-ui/core/InputLabel";
-import LinearProgress from "@material-ui/core/LinearProgress";
+import { CircularProgress } from "@material-ui/core";
+
 import {refreshArticleComment} from './utils/article'
 export default function SendComment(props) {
 	const useStyles = makeStyles(theme => ({
@@ -22,7 +23,6 @@ export default function SendComment(props) {
 			width: "100%",
 			paddingLeft: "4vw",
 			paddingRight: "2vw",
-			paddingTop: "12px",
 			paddingBottom: "12px"
 		},
 		divider: {
@@ -30,7 +30,7 @@ export default function SendComment(props) {
 			margin: 4
 		},
 		type: {
-			flexBasis: "12%"
+			flexBasis: "10%"
 		},
 		text: {
 			flexBasis: "75%"
@@ -40,9 +40,19 @@ export default function SendComment(props) {
 			display: "flex"
 		},
 		button: {
+            fontSize:"0.6rem",
 			height: "fit-content",
-			flexBasis: "13%"
-		}
+            flexBasis: "10%",
+            alignSelf: "center"
+        },
+        sending: {
+            flexBasis: "5%",
+            alignSelf: "center",
+            marginLeft:"4px"
+        },
+        lp: {
+            width:"100%",
+        }
 	}));
 
 	const info = useArticleBoardInfoContext();
@@ -50,43 +60,36 @@ export default function SendComment(props) {
 
 	const classes = useStyles();
 	const BotContext = useBotContext();
-
-	const { handleSubmit, control } = useForm();
+    const [isSending,setIsSending] = useState(false);
+    const { handleSubmit, control } = useForm();
 	// Todo : 1. 貼圖不要被切掉
     //        2. variable length
-	const wordsPerLine = 25;
+	
 	const onSubmit = async values => {
 		console.log(values);
         let text = values.text;
         // do not send empty str
         text = text.trim();
         if(text.length === 0) return;
-
+        setIsSending(true);
 		let arg = {
 			type: values.type,
-			text: "",
+			text: text,
 			boardName: article.info.boardname,
 			aid: article.info.aid
 		};
 		let command = {
 			type: "comment",
 			arg: arg
-		};
-		var i = 0;
-		for (i = 0; i < text.length / wordsPerLine; i++) {
-			arg.text = text.substring(
-				i * wordsPerLine,
-				(i + 1) * wordsPerLine > text.length
-					? text.length
-					: (i + 1) * wordsPerLine
-            );
-            try {
-                await BotContext.executeCommand(command);
-            } catch(err) {
-                console.log(err);
-                return;
-            }
+        };
+        
+        try {
+            await BotContext.executeCommand(command);
+        } catch(err) {
+            console.log(err);
+            return;
         }
+		
         // reload this article
         console.log('reload',article)
         try{
@@ -96,13 +99,12 @@ export default function SendComment(props) {
         } catch(err) {
             console.log(err);
         }
-        
+        setIsSending(false);
         
 	};
 
 	return (
 		<Grid container component="main" className={classes.root}>
-		
 			<form
 				onSubmit={handleSubmit(onSubmit)}
 				className={classes.form}
@@ -145,6 +147,8 @@ export default function SendComment(props) {
 				>
 					送出
 				</Button>
+                <Grid item className={classes.sending}>{isSending && <CircularProgress  size={"1rem"} />}</Grid>
+                
 			</form>
 		</Grid>
 	);

@@ -94,6 +94,7 @@ export default function ArticleSelect(props) {
 						看板：{info.boardName}
 					</Grid>
 					<InfiniteScroll
+						style={{overflow:"inherit"}}
 						scrollableTarget="scrollableDiv"
 						dataLength={articleItems.length} //This is important field to render the next data
 						next={handleLoadMore}

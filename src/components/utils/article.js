@@ -29,7 +29,7 @@ import { URL2AID } from "./decode";
             newArticleContent.comment = [];
             parseArticleInfoAndContent(res,newArticleContent);
             parseArticleComment(res,newArticleContent);
-            console.log(newArticleContent);
+            // console.log(newArticleContent);
             return newArticleContent;
         }catch(err) {
             return Promise.reject(err);

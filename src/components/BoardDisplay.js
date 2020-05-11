@@ -46,14 +46,18 @@ export default function BoardDisplay(props) {
 			selectedBoard === "hot"
 				? BotContext.bot.select(Board).where("entry", "hot")
 				: BotContext.bot.select(Board).where("entry", "favorite");
+		let t1 = performance.now();
 		let res = await BotContext.executeCommand({type:"select",arg:query});
+		let t2 = performance.now();
+		console.log('bot select board',t2-t1)
 		if(!res) return false;
 		console.log(res)
 		// generate list items
 		let lis = res.map(item => {
 			return BoardItem({item,info,BotContext});
 		});
-
+		let t3 = performance.now();
+		console.log('map boardItem',t3-t2)
 		setListItems(lis);
 		
 
