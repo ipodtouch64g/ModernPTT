@@ -56,7 +56,7 @@ export default function SendComment(props) {
 	}));
 
 	const info = useArticleBoardInfoContext();
-	const article = info.articleContent;
+	const article = info.article;
 
 	const classes = useStyles();
 	const BotContext = useBotContext();
@@ -94,7 +94,7 @@ export default function SendComment(props) {
         console.log('reload',article)
         try{
             let refreshArticleCommentRes = await refreshArticleComment(BotContext,{...article});
-            info.setArticleContent(refreshArticleCommentRes);
+            info.setArticle(refreshArticleCommentRes);
 
         } catch(err) {
             console.log(err);

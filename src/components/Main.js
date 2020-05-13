@@ -7,16 +7,17 @@ import Account from "./Account";
 
 import BoardArea from "./BoardArea";
 import ArticleArea from "./ArticleArea";
-import SearchBar from "./SearchBar";
+import Bar from "./Bar";
 import Container from "@material-ui/core/Container";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { UserProvider } from "./UserContext";
 import { BotProvider } from "./BotContext";
 import { ArticleBoardInfoProvider } from "./ArticleBoardInfoContext";
-import  MySnackbar  from "./MySnackbar";
+import MySnackbar from "./MySnackbar";
 import Hidden from "@material-ui/core/Hidden";
-import {ProgressProvider} from "./ProgressContext";
+import { ProgressProvider } from "./ProgressContext";
 import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
+import { Resizable } from "re-resizable";
 
 const theme = createMuiTheme({
 	typography: {
@@ -33,7 +34,15 @@ const theme = createMuiTheme({
 	}
 });
 
+const useStyles = makeStyles(theme => ({
+	resizable: {
+		display: "flex",
+		width: "100%"
+	}
+}));
+
 export default function Main() {
+	const classes = useStyles();
 	return (
 		<UserProvider>
 			<ProgressProvider>
@@ -49,16 +58,21 @@ export default function Main() {
 								<Login />
 								<Grid container>
 									<Grid item xs={12}>
-										<SearchBar />
+										<Bar />
 									</Grid>
-									<Hidden xsDown>
-										<Grid item sm={3} direction="column">
+									<Grid item className={classes.resizable}>
+										<Resizable
+											defaultSize={{
+												width: "25vw",
+												height: "100%"
+											}}
+											enable={{ top:false, right:true, bottom:false, left:false, topRight:false, bottomRight:false, bottomLeft:false, topLeft:false }}
+										>
 											<BoardArea />
-										</Grid>
-									</Hidden>
-									<Grid item xs={12} sm={9}>
+										</Resizable>
 										<ArticleArea />
 									</Grid>
+
 									<MySnackbar />
 								</Grid>
 							</Container>

@@ -19,11 +19,11 @@ export default function ArticleItem(props) {
 		console.log("article item click:", info, item, BotContext);
 		try {
 			let t1 = performance.now();
-			let articleContent = await parseArticle(item,BotContext);
+			let article = await parseArticle(item,BotContext);
 			info.setIndex(1);
-			info.setArticleContent(articleContent);
+			info.setArticle(article);
 			let t2 = performance.now();
-			console.log("articleContent load time",t2-t1);
+			console.log("article load time",t2-t1);
 		} catch(err) {
 			console.log(err);
 		}
@@ -35,7 +35,7 @@ export default function ArticleItem(props) {
 			button
 			key={item.id}
 			divider={true}
-			style={{ height: "9vh" }}
+			style={{ height: "10vh" }}
 		>
 			<ListItem
 				style={{ flexBasis: "15%", flexGrow: "0", flexShrink: "0" }}

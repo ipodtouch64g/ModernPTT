@@ -5,7 +5,7 @@ import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import Typography from "@material-ui/core/Typography";
-import { Article } from "ptt-client/dist/sites/ptt/model";
+import {getArticleList} from './utils/article'
 
 export default function BoardItem(props) {
 	let item = props.item;
@@ -15,30 +15,21 @@ export default function BoardItem(props) {
 	const handleClick = async () => {
 		console.log("boardItem click", item, info, BotContext);
 		try {
-			// set articleList
-			let query = BotContext.bot
-				.select(Article)
-				.where("boardname", item.name);
-			let res = await BotContext.executeCommand({
-				type: "select",
-				arg: query
-			});
-		
-			console.log("handleclick", res);
-
-			info.setIndex(0);
+			let res = await getArticleList(BotContext,{boardname:item.name});
 			info.setArticleList(res);
 			info.setBoardName(item.name);
-		} catch (err) {
+			info.setIndex(0);
+		}catch(err) {
 			console.log(err);
 		}
+		
 	};
 
 	return (
 		<ListItem
 			button
 			onClick={handleClick}
-			key={item.id}
+			key={item.name}
 			style={{ height: "10vh" }}
 		>
 			<ListItemText

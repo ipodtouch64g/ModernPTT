@@ -6,7 +6,7 @@ import { useBotContext } from "./BotContext";
 const useArticleBoardInfo = () => {
 	const BotContext = useBotContext();
 	const [boardName, setBoardName] = useState("");
-	const [articleContent, setArticleContent] = new useState({
+	const [article, setArticle] = new useState({
 		info: {
 			id: "",
 			aid: "",
@@ -26,8 +26,8 @@ const useArticleBoardInfo = () => {
 	const info = {
 		boardName: boardName,
 		setBoardName: setBoardName,
-		articleContent: articleContent,
-		setArticleContent: setArticleContent,
+		article: article,
+		setArticle: setArticle,
 		articleList: articleList,
 		setArticleList: setArticleList,
 		index: index,
