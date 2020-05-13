@@ -19,6 +19,8 @@ const parseArticle = async (articleItem, BotContext) => {
 		};
 		newArticleContent.info.boardname = articleItem.boardname;
 		newArticleContent.info.id = articleItem.id;
+		newArticleContent.info.title = articleItem.title;
+		//console.warn(articleItem);
 		let res = await getArticleResponse(BotContext, newArticleContent);
 		newArticleContent.info.aid = "";
 		newArticleContent.info.author = res.author;
@@ -41,7 +43,7 @@ const getArticleResponse = async (BotContext, newArticleContent) => {
 	let query = BotContext.bot
 		.select(ArticleModel)
 		.where("boardname", newArticleContent.info.boardname)
-		.where("id", newArticleContent.info.id);
+		.where("title", newArticleContent.info.title);
 	let res = await BotContext.executeCommand({
 		type: "content",
 		arg: query
