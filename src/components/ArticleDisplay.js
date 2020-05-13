@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useArticleBoardInfoContext } from "./ArticleBoardInfoContext";
-import Skeleton from "react-loading-skeleton";
 import Grid from "@material-ui/core/Grid";
 import { makeStyles } from "@material-ui/core/styles";
 import CssBaseline from "@material-ui/core/CssBaseline";
 
-import InfiniteScroll from "react-infinite-scroll-component";
-import CircularProgress from "@material-ui/core/CircularProgress";
 import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
@@ -84,7 +81,7 @@ export default function ArticleDisplay(props) {
 	}));
 
 	const info = useArticleBoardInfoContext();
-	const article = info.articleContent;
+	const article = info.article;
 	const classes = useStyles();
 
 	// Todo : 1. 排版會跑掉
@@ -155,7 +152,7 @@ export default function ArticleDisplay(props) {
 
 	const ref = React.createRef();
 
-	// go back to top when load new articleContent
+	// go back to top when load new article
 	useEffect(() => {
 		if (info.index === 1) {
 			ref.current.scrollTop = 0;

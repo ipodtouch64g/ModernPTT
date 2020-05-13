@@ -1,23 +1,23 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "6f1e723e218ccad5b321f4442e587f40",
+    "revision": "e07f93ed16f2291500d3b49c99439f20",
     "url": "/ModernPTT/index.html"
   },
   {
-    "revision": "4053b785cf60ab39e907",
+    "revision": "7b3e99fe46b5b1dcce24",
     "url": "/ModernPTT/static/css/main.d498bfb3.chunk.css"
   },
   {
-    "revision": "30a268b66bb90b404765",
-    "url": "/ModernPTT/static/js/2.a98d1038.chunk.js"
+    "revision": "0e5a4467c7b2fa06aacf",
+    "url": "/ModernPTT/static/js/2.c5ab938a.chunk.js"
   },
   {
     "revision": "b040bf30180637b59575e45a86bfd994",
-    "url": "/ModernPTT/static/js/2.a98d1038.chunk.js.LICENSE.txt"
+    "url": "/ModernPTT/static/js/2.c5ab938a.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "4053b785cf60ab39e907",
-    "url": "/ModernPTT/static/js/main.c376dbe9.chunk.js"
+    "revision": "7b3e99fe46b5b1dcce24",
+    "url": "/ModernPTT/static/js/main.7f551161.chunk.js"
   },
   {
     "revision": "06acccc5e4d4f8d42e61",

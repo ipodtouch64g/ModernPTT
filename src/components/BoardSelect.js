@@ -5,6 +5,10 @@ import Skeleton from "react-loading-skeleton";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import { useBotContext } from "./BotContext";
+import IconButton from "@material-ui/core/IconButton";
+import SearchIcon from "@material-ui/icons/Search";
+import InputBase from "@material-ui/core/InputBase";
+import Collapse from "@material-ui/core/Collapse";
 
 export default function BoardSelect(props) {
 	const useStyles = makeStyles(theme => ({
@@ -14,19 +18,49 @@ export default function BoardSelect(props) {
 		},
 		root: {
 			justifyContent: "center",
-			alignItems: "center"
-		}
+			alignItems: "center",
+			
+		},
+		select: {
+			display: "flex",
+			flexDirection: "column",
+			width: "100%"
+		},
+		tabs: {
+			flexBasis: "85%"
+		},
+		tab: {
+			fontSize: "0.8rem",
+			minWidth: "50%"
+		},
+		searchBotton: {
+			flexBasis: "15%",
+		},
+		btntabs: {
+			width: "100%",
+			display: "flex"
+		},
+		inputbase: {}
 	}));
 
 	const classes = useStyles();
 	const BotContext = useBotContext();
 	const [selectedValue, setSelectedValue] = useState(0);
+	const [isInputShow, setIsInputShow] = useState(false);
+	let setSelectedBoard = props.setSelectedBoard;
+	let setSearchBoardText = props.setSearchBoardText;
 
-	const handleChange = (e,v) => {
+	const handleChange = (e, v) => {
 		setSelectedValue(v);
 	};
-
-	let setSelectedBoard = props.setSelectedBoard;
+	const handleSearchClick = () => {
+		setIsInputShow(isInputShow => !isInputShow);
+	};
+	const handleInputbaseOnChange = (e) => {
+		console.log('search board text',e.target.value);
+		setSearchBoardText(e.target.value);
+	}
+	
 	useEffect(() => {
 		let selectedBoard = "hot";
 		switch (selectedValue) {
@@ -48,15 +82,44 @@ export default function BoardSelect(props) {
 				{!BotContext.botState.login && <Skeleton count={1} />}
 			</Grid>
 			{BotContext.botState.login && (
-				<Tabs
-					value={selectedValue}
-					indicatorColor="primary"
-					textColor="primary"
-					onChange={handleChange}
-				>
-					<Tab label="熱門看板" />
-					<Tab label="最愛看板" />
-				</Tabs>
+				<Grid item className={classes.select}>
+					<Grid item className={classes.btntabs}>
+						<IconButton
+							color="primary"
+							aria-label="search board"
+							className={classes.searchBotton}
+							onClick={handleSearchClick}
+						>
+							<SearchIcon />
+						</IconButton>
+						<Tabs
+							value={selectedValue}
+							indicatorColor="primary"
+							textColor="primary"
+							onChange={handleChange}
+							className={classes.tabs}
+							variant="scrollable"
+						>
+							<Tab
+								wrapped
+								label="熱門看板"
+								className={classes.tab}
+							/>
+							<Tab
+								wrapped
+								label="最愛看板"
+								className={classes.tab}
+							/>
+						</Tabs>
+					</Grid>
+					<Collapse in={isInputShow}>
+						<InputBase
+							onChange={handleInputbaseOnChange}
+							placeholder="搜尋看板"
+							className={classes.inputbase}
+						/>
+					</Collapse>
+				</Grid>
 			)}
 		</Grid>
 	);
