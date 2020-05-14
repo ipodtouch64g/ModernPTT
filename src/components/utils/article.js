@@ -1,7 +1,7 @@
 import { Article as ArticleModel } from "ptt-client/dist/sites/ptt/model";
 import { URL2AID } from "./decode";
 
-const parseArticle = async (articleItem, BotContext, isSearchMode) => {
+const parseArticle = async (articleItem, BotContext,criteria) => {
 	try {
 		let newArticleContent = {
 			info: {
@@ -24,7 +24,7 @@ const parseArticle = async (articleItem, BotContext, isSearchMode) => {
 		let res = await getArticleResponse(
 			BotContext,
 			newArticleContent,
-			isSearchMode
+			criteria
 		);
 
 		newArticleContent.info.aid = "";
@@ -47,7 +47,7 @@ const parseArticle = async (articleItem, BotContext, isSearchMode) => {
 const getArticleResponse = async (
 	BotContext,
 	newArticleContent,
-	isSearchMode
+	criteria
 ) => {
 	// we should still use id.
 	// 置底文例外處理
@@ -55,16 +55,15 @@ const getArticleResponse = async (
 		.select(ArticleModel)
 		.where("boardname", newArticleContent.info.boardname)
 		.where("id", newArticleContent.info.id);
-	// When under search mode, we should call getOneInSearch() API in bot.
-	// We specify this in the command.
-	//console.log('isSearchMode',isSearchMode)
-	let type = isSearchMode ? "contentSearch" : "contentNormal";
+		if (criteria.title) query.where("title", criteria.title);
+		if (criteria.author) query.where("author", criteria.author);
+		if (criteria.push) query.where("push", criteria.push);
 	let res = await BotContext.executeCommand({
-		type: type,
+		type: 'content',
 		arg: query
 	});
 	if (!res) return Promise.reject("getArticleResponse err.");
-	//console.log(res);
+	console.log(res);
 	return res;
 };
 
@@ -133,12 +132,12 @@ const parseArticleComment = (res, newArticleContent) => {
 const refreshArticleComment = async (
 	BotContext,
 	newArticleContent,
-	isSearchMode
+	criteria
 ) => {
 	let res = await getArticleResponse(
 		BotContext,
 		newArticleContent,
-		isSearchMode
+		criteria
 	);
 	if (!res) return Promise.reject("refreshArticleComment err");
 	parseArticleComment(res, newArticleContent);
@@ -146,14 +145,24 @@ const refreshArticleComment = async (
 	return newArticleContent;
 };
 
-// Get articleList based on boardname
+// Get articleList based on searching criteria
+// criteria = { boardname:'',
+//  			title:'',
+//   			author:'',
+//    			push:'',
+//				id:'',
+// 			  }
 
-const getArticleList = async (BotContext, boardname) => {
+const getArticleList = async (BotContext, criteria) => {
 	try {
 		// build query based on criteria
 		let query = BotContext.bot
 			.select(ArticleModel)
-			.where("boardname", boardname);
+			.where("boardname", criteria.boardname);
+		if (criteria.id) query.where('id', criteria.id);
+		if (criteria.title) query.where("title", criteria.title);
+		if (criteria.author) query.where("author", criteria.author);
+		if (criteria.push) query.where("push", criteria.push);
 
 		let res = await BotContext.executeCommand({
 			type: "select",
@@ -165,35 +174,29 @@ const getArticleList = async (BotContext, boardname) => {
 	}
 };
 
-// Get articleList based on searching criteria
-// criteria = { boardname:'',
-//  			title:'',
-//   			author:'',
-//    			push:''
-// 			  }
-const getArticleListIterator = async (BotContext, criteria) => {
-	try {
-		// build query based on criteria
-		let query = BotContext.bot
-			.select(ArticleModel)
-			.where("boardname", criteria.boardname);
-		if (criteria.title) query.where("title", criteria.title);
-		if (criteria.author) query.where("author", criteria.author);
-		if (criteria.push) query.where("push", criteria.push);
-		// res will be an iterator
-		let res = await BotContext.executeCommand({
-			type: "selectIterator",
-			arg: query
-		});
-		return res;
-	} catch (err) {
-		return Promise.reject(err);
-	}
-};
+
+// const getArticleListIterator = async (BotContext, criteria) => {
+// 	try {
+// 		// build query based on criteria
+// 		let query = BotContext.bot
+// 			.select(ArticleModel)
+// 			.where("boardname", criteria.boardname);
+// 		if (criteria.title) query.where("title", criteria.title);
+// 		if (criteria.author) query.where("author", criteria.author);
+// 		if (criteria.push) query.where("push", criteria.push);
+// 		// res will be an iterator
+// 		let res = await BotContext.executeCommand({
+// 			type: "selectIterator",
+// 			arg: query
+// 		});
+// 		return res;
+// 	} catch (err) {
+// 		return Promise.reject(err);
+// 	}
+// };
 
 export {
 	parseArticle,
 	refreshArticleComment,
 	getArticleList,
-	getArticleListIterator
 };

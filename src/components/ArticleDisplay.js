@@ -165,7 +165,7 @@ export default function ArticleDisplay(props) {
 			{info.index ? (
 				<IconButton
 					onClick={e => {
-						info.setIndex(info.articleSearchIterator ? 1 : 0);
+						info.setIndex(info.articleSearchList.length > 0 ? 1 : 0);
 					}}
 					className={classes.goback}
 				>
