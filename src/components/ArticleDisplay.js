@@ -89,9 +89,9 @@ export default function ArticleDisplay(props) {
 	//
 	const genContentList = content => {
 		if (content) {
-			let res = content.map(item => {
+			let res = content.map((item,index) => {
 				return (
-					<ListItem disableGutters={true} className={classes.lit}>
+					<ListItem key={index} disableGutters={true} className={classes.lit}>
 						<ListItemText primary={item} />
 					</ListItem>
 				);

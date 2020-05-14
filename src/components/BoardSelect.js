@@ -57,7 +57,7 @@ export default function BoardSelect(props) {
 		setIsInputShow(isInputShow => !isInputShow);
 	};
 	const handleInputbaseOnChange = (e) => {
-		console.log('search board text',e.target.value);
+		//console.log('search board text',e.target.value);
 		setSearchBoardText(e.target.value);
 	}
 	

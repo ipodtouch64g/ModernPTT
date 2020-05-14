@@ -26,20 +26,20 @@ export default function ArticleSearch(props) {
 			width: "80%"
 		},
 		info: {
-            height: 'fit-content',
+			height: "fit-content",
 			backgroundColor: "rgba(0,0,0,0.1)"
 		},
 		goback: {
 			width: "4vw",
 			zIndex: 1001
-        },
-        buttoninfo: {
-            top: '0',
-            display: 'flex',
-            width: '100%',
-            position: 'absolute',
-            justifyContent: 'space-between',
-        }
+		},
+		buttoninfo: {
+			top: "0",
+			display: "flex",
+			width: "100%",
+			position: "absolute",
+			justifyContent: "space-between"
+		}
 	}));
 
 	const classes = useStyles();
@@ -54,11 +54,11 @@ export default function ArticleSearch(props) {
 	useEffect(() => {
 		const setList = async it => {
 			let res = await it.next();
-			//console.log(res);
 			if (!res.done) {
 				setArticleListSearch(res.value.reverse());
 				setHasMore(true);
 				info.setIndex(1);
+				//console.log("use iterator the first time", info);
 			}
 		};
 		let it = info.articleSearchIterator;
@@ -69,26 +69,31 @@ export default function ArticleSearch(props) {
 
 	// generate items
 	useEffect(() => {
-		//console.log("articleListSearch", articleListSearch);
+		////console.log("articleListSearch", articleListSearch);
 		if (articleListSearch.length > 0) {
 			// generate list items
 			let res = articleListSearch.map(item => {
-				return ArticleItem({ item, info, BotContext });
+				return ArticleItem({
+					item,
+					info,
+					BotContext,
+					isSearchMode : true,
+				});
 			});
 
 			setArticleItemsSearch(res);
-			//console.log("hi res", res);
+			////console.log("hi res", res);
 		}
 	}, [articleListSearch]);
 
 	const handleLoadMore = async () => {
-		//console.log("hlm");
+		////console.log("hlm");
 		// last id from current list
 		let l_id = articleListSearch[articleListSearch.length - 1].id;
-		//console.log("l_id", l_id);
+		////console.log("l_id", l_id);
 		let it = info.articleSearchIterator;
 		let res = await it.next();
-		//console.log("hlm res", res);
+		////console.log("hlm res", res);
 		if (res.done) {
 			setHasMore(false);
 		} else {
@@ -120,9 +125,9 @@ export default function ArticleSearch(props) {
 					<IconButton
 						onClick={e => {
 							info.setIndex(0);
-                            info.setArticleSearchIterator(null);
-                            // force bot to get back to index page
-                            BotContext.executeCommand({type:'index'});
+							info.setArticleSearchIterator(null);
+							// force bot to get back to index page
+							BotContext.executeCommand({ type: "index" });
 						}}
 						className={classes.goback}
 					>
@@ -130,10 +135,18 @@ export default function ArticleSearch(props) {
 					</IconButton>
 
 					<Grid item className={classes.info}>
-                        {info.criteria.boardname ? `看板：${info.criteria.boardname}` : ''}
-                        {info.criteria.title ? `．標題：${info.criteria.title}` : ''}
-                        {info.criteria.author ? `．作者：${info.criteria.author}` : ''}
-                        {info.criteria.push ? `．讚數：${info.criteria.push}` : ''}
+						{info.criteria.boardname
+							? `看板：${info.criteria.boardname}`
+							: ""}
+						{info.criteria.title
+							? `．標題：${info.criteria.title}`
+							: ""}
+						{info.criteria.author
+							? `．作者：${info.criteria.author}`
+							: ""}
+						{info.criteria.push
+							? `．讚數：${info.criteria.push}`
+							: ""}
 					</Grid>
 				</Grid>
 

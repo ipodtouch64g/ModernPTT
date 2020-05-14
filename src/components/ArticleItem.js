@@ -12,6 +12,7 @@ export default function ArticleItem(props) {
 	let item = props.item;
 	let info = props.info;
 	let BotContext = props.BotContext;
+	let isSearchMode = props.isSearchMode ? true : false;
 
 	const handleClick = async () => {
 		// handle deleted article
@@ -20,13 +21,15 @@ export default function ArticleItem(props) {
 		console.log("article item click:", info, item, BotContext);
 		try {
 			let t1 = performance.now();
-			let article = await parseArticle(item,BotContext);
+			let article;
+			article = await parseArticle(item,BotContext,isSearchMode);
+
 			info.setIndex(2);
 			info.setArticle(article);
 			let t2 = performance.now();
-			console.log("article load time",t2-t1);
+			//console.log("article load time",t2-t1);
 		} catch(err) {
-			console.log(err);
+			console.error(err);
 		}
 	};
 

@@ -47,7 +47,7 @@ export default function BoardDisplay(props) {
 	const getBoardCallback = useCallback(async () => {
 		// if searchBoardText is not empty -> search board with this text
 		// else search based on selectedBoard
-		console.log("searchCache", searchCache);
+		//console.log("searchCache", searchCache);
 		let lis;
 		let query;
 		if (searchBoardText.length > 0) {
@@ -62,7 +62,7 @@ export default function BoardDisplay(props) {
 			// already cached
 			if (selectedBoard === "hot" && hotItems.current) {
 				lis = hotItems.current;
-				console.log("hot cache", hotItems);
+				//console.log("hot cache", hotItems);
 			} else if (selectedBoard === "favorite" && favoriteItems.current) {
 				lis = favoriteItems.current;
 			} else {
@@ -81,15 +81,15 @@ export default function BoardDisplay(props) {
 				arg: query
 			});
 			let t2 = performance.now();
-			console.log("bot select board", t2 - t1);
+			//console.log("bot select board", t2 - t1);
 			if (!res) return false;
-			console.log(res);
+			//console.log(res);
 			// generate list items
 			lis = res.map(item => {
 				return BoardItem({ item, info, BotContext });
 			});
 			let t3 = performance.now();
-			console.log("map boardItem", t3 - t2);
+			//console.log("map boardItem", t3 - t2);
 
 			// we cache for speed
 			if (searchBoardText.length === 0) {
@@ -111,7 +111,7 @@ export default function BoardDisplay(props) {
 		}
 		// get board list at the beginning
 		if (BotContext.botState.login) {
-			console.log(selectedBoard);
+			//console.log(selectedBoard);
 			getBoard();
 		}
 	}, [BotContext.botState.login, selectedBoard, searchBoardText]);

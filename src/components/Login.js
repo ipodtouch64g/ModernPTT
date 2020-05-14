@@ -94,7 +94,7 @@ export default function Login() {
 
 	const loginCallback = useCallback(
 		async myUser => {
-			console.log(myUser);
+			//console.log(myUser);
 			setOpenForm(false);
 			setOpenLoadingCircle(true);
 			let res = await BotContext.executeCommand({
@@ -102,12 +102,12 @@ export default function Login() {
 				arg: myUser
 			});
 			if (res) {
-				console.log("login success");
+				//console.log("login success");
 				setOpenBackDrop(false);
 				setOpenLoadingCircle(false);
 				return true;
 			} else {
-				console.log("login fail");
+				//console.log("login fail");
 				setSnackbarContent({
 					severity: "error",
 					text: "帳密輸入錯誤！！"
@@ -132,8 +132,8 @@ export default function Login() {
 		async function tryLogin() {
 			await loginCallback(user);
 		}
-		console.log("botState:", BotContext.botState);
-		console.log("prev botState:", BotContext.prevBotState);
+		//console.log("botState:", BotContext.botState);
+		//console.log("prev botState:", BotContext.prevBotState);
 		if (user) {
 			if (BotContext.prevBotState === undefined) return;
 			if (

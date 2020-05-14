@@ -1,7 +1,7 @@
 import { Article as ArticleModel } from "ptt-client/dist/sites/ptt/model";
 import { URL2AID } from "./decode";
 
-const parseArticle = async (articleItem, BotContext) => {
+const parseArticle = async (articleItem, BotContext, isSearchMode) => {
 	try {
 		let newArticleContent = {
 			info: {
@@ -20,8 +20,13 @@ const parseArticle = async (articleItem, BotContext) => {
 		newArticleContent.info.boardname = articleItem.boardname;
 		newArticleContent.info.id = articleItem.id;
 		newArticleContent.info.title = articleItem.title;
-		//console.warn(articleItem);
-		let res = await getArticleResponse(BotContext, newArticleContent);
+
+		let res = await getArticleResponse(
+			BotContext,
+			newArticleContent,
+			isSearchMode
+		);
+
 		newArticleContent.info.aid = "";
 		newArticleContent.info.author = res.author;
 		newArticleContent.info.timestamp = res.timestamp;
@@ -32,27 +37,38 @@ const parseArticle = async (articleItem, BotContext) => {
 		newArticleContent.comment = [];
 		parseArticleInfoAndContent(res, newArticleContent);
 		parseArticleComment(res, newArticleContent);
-		// console.log(newArticleContent);
+		// //console.log(newArticleContent);
 		return newArticleContent;
 	} catch (err) {
 		return Promise.reject(err);
 	}
 };
 
-const getArticleResponse = async (BotContext, newArticleContent) => {
+const getArticleResponse = async (
+	BotContext,
+	newArticleContent,
+	isSearchMode
+) => {
+	// we should still use id.
+	// 置底文例外處理
 	let query = BotContext.bot
 		.select(ArticleModel)
 		.where("boardname", newArticleContent.info.boardname)
-		.where("title", newArticleContent.info.title);
+		.where("id", newArticleContent.info.id);
+	// When under search mode, we should call getOneInSearch() API in bot.
+	// We specify this in the command.
+	//console.log('isSearchMode',isSearchMode)
+	let type = isSearchMode ? "contentSearch" : "contentNormal";
 	let res = await BotContext.executeCommand({
-		type: "content",
+		type: type,
 		arg: query
 	});
 	if (!res) return Promise.reject("getArticleResponse err.");
-	console.log(res);
+	//console.log(res);
 	return res;
 };
 
+// Start from top.
 const parseArticleInfoAndContent = (res, newArticleContent) => {
 	let content = res.content;
 	// content starts from index 4
@@ -61,18 +77,24 @@ const parseArticleInfoAndContent = (res, newArticleContent) => {
 		if (s.startsWith("※ 發信站: 批踢踢實業坊(ptt.cc)")) {
 			newArticleContent.info.ip = s.substring(27);
 			// next line should be "※ 文章網址: https://www.ptt.cc/bbs/Test/M.1588897271.A.57F.html"
-			// parse as AID
-			let aidLine = content[++i].str;
-			let url = aidLine.substring(aidLine.indexOf(":") + 2);
-			const [board, AID] = URL2AID(url);
-			newArticleContent.info.aid = AID;
-			newArticleContent.info.commentStartIndex = i + 1;
-			break;
+			if (
+				i + 1 < content.length &&
+				content[i + 1].str.startsWith("※ 文章網址: ")
+			) {
+				// parse as AID
+				let aidLine = content[++i].str;
+				let url = aidLine.substring(aidLine.indexOf(":") + 2);
+				const [board, AID] = URL2AID(url);
+				newArticleContent.info.aid = AID;
+				newArticleContent.info.commentStartIndex = i + 1;
+				break;
+			}	
 		} else {
 			newArticleContent.content.push(s);
 		}
 	}
 };
+// Starts from top.
 // Todo : check commentStartIndex is correct.
 const parseArticleComment = (res, newArticleContent) => {
 	if (newArticleContent.info.commentStartIndex === -1) return;
@@ -91,6 +113,8 @@ const parseArticleComment = (res, newArticleContent) => {
 		let commentLine = { type: "", author: "", text: "", timestamp: "" };
 		// find out whether it is a normal comment
 		if (s.match(/[推噓→]\s+[\w\d]+\s*:.+/)) {
+			// todo : check has ip
+
 			commentLine.floor = floor++;
 			commentLine.type = s[0];
 			commentLine.timestamp = s.substring(s.length - 11);
@@ -103,13 +127,22 @@ const parseArticleComment = (res, newArticleContent) => {
 		newArticleContent.comment.push(commentLine);
 	}
 };
+
 // This is used when you already have article.
 // Used in sendComment because we only need to refresh comment.
-const refreshArticleComment = async (BotContext, newArticleContent) => {
-	let res = await getArticleResponse(BotContext, newArticleContent);
+const refreshArticleComment = async (
+	BotContext,
+	newArticleContent,
+	isSearchMode
+) => {
+	let res = await getArticleResponse(
+		BotContext,
+		newArticleContent,
+		isSearchMode
+	);
 	if (!res) return Promise.reject("refreshArticleComment err");
 	parseArticleComment(res, newArticleContent);
-	console.log("refresh", newArticleContent.comment);
+	//console.log("refresh", newArticleContent.comment);
 	return newArticleContent;
 };
 
@@ -121,7 +154,7 @@ const getArticleList = async (BotContext, boardname) => {
 		let query = BotContext.bot
 			.select(ArticleModel)
 			.where("boardname", boardname);
-		
+
 		let res = await BotContext.executeCommand({
 			type: "select",
 			arg: query
@@ -131,7 +164,6 @@ const getArticleList = async (BotContext, boardname) => {
 		return Promise.reject(err);
 	}
 };
-
 
 // Get articleList based on searching criteria
 // criteria = { boardname:'',
@@ -159,4 +191,9 @@ const getArticleListIterator = async (BotContext, criteria) => {
 	}
 };
 
-export { parseArticle, refreshArticleComment, getArticleList,getArticleListIterator };
+export {
+	parseArticle,
+	refreshArticleComment,
+	getArticleList,
+	getArticleListIterator
+};

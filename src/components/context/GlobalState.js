@@ -19,7 +19,7 @@ const GlobalState = props => {
 	});
 
 	bot.on("connect", () => {
-		console.log("bot connected");
+		//console.log("bot connected");
 		// setBotState(bot.state);
 	});
 

@@ -1,4 +1,4 @@
-import React ,{useState} from "react";
+import React, { useState } from "react";
 import { useArticleBoardInfoContext } from "./ArticleBoardInfoContext";
 import { useBotContext } from "./BotContext";
 
@@ -16,7 +16,7 @@ import { useForm, Controller } from "react-hook-form";
 import InputLabel from "@material-ui/core/InputLabel";
 import { CircularProgress } from "@material-ui/core";
 
-import {refreshArticleComment} from './utils/article'
+import { refreshArticleComment } from "./utils/article";
 export default function SendComment(props) {
 	const useStyles = makeStyles(theme => ({
 		root: {
@@ -40,19 +40,19 @@ export default function SendComment(props) {
 			display: "flex"
 		},
 		button: {
-            fontSize:"0.6rem",
+			fontSize: "0.6rem",
 			height: "fit-content",
-            flexBasis: "10%",
-            alignSelf: "center"
-        },
-        sending: {
-            flexBasis: "5%",
-            alignSelf: "center",
-            marginLeft:"4px"
-        },
-        lp: {
-            width:"100%",
-        }
+			flexBasis: "10%",
+			alignSelf: "center"
+		},
+		sending: {
+			flexBasis: "5%",
+			alignSelf: "center",
+			marginLeft: "4px"
+		},
+		lp: {
+			width: "100%"
+		}
 	}));
 
 	const info = useArticleBoardInfoContext();
@@ -60,47 +60,53 @@ export default function SendComment(props) {
 
 	const classes = useStyles();
 	const BotContext = useBotContext();
-    const [isSending,setIsSending] = useState(false);
-    const { handleSubmit, control } = useForm();
+	const [isSending, setIsSending] = useState(false);
+	const { handleSubmit, control } = useForm();
 	// Todo : 1. 貼圖不要被切掉
-    //        2. variable length
-	
+	//        2. variable length
+
 	const onSubmit = async values => {
-		console.log(values);
-        let text = values.text;
-        // do not send empty str
-        text = text.trim();
-        if(text.length === 0) return;
-        setIsSending(true);
+		//console.log(values);
+		let text = values.text;
+		// do not send empty str
+		text = text.trim();
+		if (text.length === 0) return;
+		setIsSending(true);
+		let isSearchMode = info.articleSearchIterator ? true : false;
 		let arg = {
 			type: values.type,
 			text: text,
 			boardName: article.info.boardname,
 			aid: article.info.aid
 		};
+		// Choose mode.
 		let command = {
-			type: "comment",
+			type: isSearchMode
+				? "commentSearch"
+				: "commentNormal",
 			arg: arg
-        };
-        
-        try {
-            await BotContext.executeCommand(command);
-        } catch(err) {
-            console.log(err);
-            return;
-        }
-		
-        // reload this article
-        console.log('reload',article)
-        try{
-            let refreshArticleCommentRes = await refreshArticleComment(BotContext,{...article});
-            info.setArticle(refreshArticleCommentRes);
+		};
 
-        } catch(err) {
-            console.log(err);
-        }
-        setIsSending(false);
-        
+		try {
+			await BotContext.executeCommand(command);
+		} catch (err) {
+			console.error(err);
+			return;
+		}
+
+		// reload this article
+		//console.log("reload", article);
+		try {
+			let refreshArticleCommentRes = await refreshArticleComment(
+				BotContext,
+				{ ...article },
+				isSearchMode
+			);
+			info.setArticle(refreshArticleCommentRes);
+		} catch (err) {
+			console.error(err);
+		}
+		setIsSending(false);
 	};
 
 	return (
@@ -147,8 +153,9 @@ export default function SendComment(props) {
 				>
 					送出
 				</Button>
-                <Grid item className={classes.sending}>{isSending && <CircularProgress  size={"1rem"} />}</Grid>
-                
+				<Grid item className={classes.sending}>
+					{isSending && <CircularProgress size={"1rem"} />}
+				</Grid>
 			</form>
 		</Grid>
 	);

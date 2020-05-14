@@ -4,9 +4,10 @@ import Ptt from "ptt-client";
 import usePrev from "./usePrev";
 import { useProgressContext } from "./ProgressContext";
 
+/* 救命 為啥他有時候會一直亂new 中邪了嗎 也不是斷線阿？ */
 const useBot = () => {
 	
-	console.log('new useBot()')
+	console.info('new useBot()')
 	const [bot] = useState(new Ptt());
 	
 	const [botState, setBotState] = useState(bot.state);
@@ -15,12 +16,12 @@ const useBot = () => {
 	const { setIsSnackbarOpen, setSnackbarContent } = useProgressContext();
 
 	bot.on("connect", () => {
-		console.log("bot connected");
+		//console.log("bot connected");
 		setBotState(bot.state);
 	});
 
 	bot.on("disconnect", () => {
-		console.log("bot disconnected");
+		//console.log("bot disconnected");
 		setBotState(bot.state);
 	});
 
@@ -43,7 +44,7 @@ const useBot = () => {
 			return Promise.reject('bot is busy!');
 		}
 		busy = true;
-		console.log("bot command : ", command);
+		//console.log("bot command : ", command);
 		try {
 			// not connected
 			if (!botState.connect) return Promise.reject('not login!');
@@ -78,18 +79,34 @@ const useBot = () => {
 				// BUG!BUG!BUG!BUG!BUG!BUG!
 				return iterator;
 			}
-			// content
-			if (command.type === "content") {
+			// content in normal mode
+			if (command.type === "contentNormal") {
 				if (!botState.login) return false;
 				let query = command.arg;
 				let res = await query.getOne();
 				busy = false;
 				return res;
 			}
-			// comment
-			if (command.type === "comment") {
+			// content in search mode
+			if (command.type === "contentSearch") {
+				if (!botState.login) return false;
+				let query = command.arg;
+				let res = await query.getOneInSearch();
+				busy = false;
+				return res;
+			}
+			// comment in normal mode
+			if (command.type === "commentNormal") {
 				if (!botState.login) return false;
 				await bot.sendComment(command.arg);
+				busy = false;
+				return true;
+			}
+
+			// comment in search mode
+			if (command.type === "commentSearch") {
+				if (!botState.login) return false;
+				await bot.sendCommentSearchMode(command.arg);
 				busy = false;
 				return true;
 			}

@@ -119,7 +119,7 @@ export default function ArticleSelect(props) {
 	const { handleSubmit, control, errors } = useForm();
 
 	const onSubmitSearch = async values => {
-		console.log(values);
+		//console.log(values);
 		// search for matching articles
 		let criteria = {
 			boardname: info.boardName,
@@ -130,11 +130,11 @@ export default function ArticleSelect(props) {
 		info.setCriteria(criteria);
 		try {
 			let res = await getArticleListIterator(BotContext, criteria);
-			console.log(res);
+			//console.log(res);
 			info.setArticleSearchIterator(res);
 			toggleSearchForm();
 		} catch (err) {
-			console.log(err);
+			console.error(err);
 		}
 	};
 
@@ -142,7 +142,7 @@ export default function ArticleSelect(props) {
 		// prevent default action
 		if (info.articleList.length === 0) return;
 
-		console.log("handleLoadMore", info);
+		//console.log("handleLoadMore", info);
 		let offset = info.articleList[info.articleList.length - 1].id;
 		let query = BotContext.bot
 			.select(Article)
@@ -152,7 +152,7 @@ export default function ArticleSelect(props) {
 			type: "select",
 			arg: query
 		}).then(res => {
-			console.log("res", res);
+			//console.log("res", res);
 			if (!res) return false;
 			// generate list items
 			let res_reduced = res.reduce((rtn, item) => {
