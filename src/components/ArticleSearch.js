@@ -11,6 +11,7 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import IconButton from "@material-ui/core/IconButton";
 
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
+import { getArticleList } from "./utils/article";
 
 export default function ArticleSearch(props) {
 	const useStyles = makeStyles(theme => ({
@@ -46,58 +47,45 @@ export default function ArticleSearch(props) {
 	const info = useArticleBoardInfoContext();
 	const BotContext = useBotContext();
 
-	const [articleListSearch, setArticleListSearch] = useState([]);
-	const [articleItemsSearch, setArticleItemsSearch] = useState([]);
-	const [hasMore, setHasMore] = useState(false);
+	const [articleItems, setArticleItems] = useState([]);
 
-	// use iterator the first time
-	useEffect(() => {
-		const setList = async it => {
-			let res = await it.next();
-			if (!res.done) {
-				setArticleListSearch(res.value.reverse());
-				setHasMore(true);
-				info.setIndex(1);
-				//console.log("use iterator the first time", info);
-			}
-		};
-		let it = info.articleSearchIterator;
-		if (it) {
-			setList(it);
-		}
-	}, [info.articleSearchIterator]);
+	const hasMore = () => {
+		return (
+			info.articleSearchList.length > 0 &&
+			info.articleSearchList[info.articleSearchList.length - 1].id > 1
+		);
+	};
 
 	// generate items
 	useEffect(() => {
 		////console.log("articleListSearch", articleListSearch);
-		if (articleListSearch.length > 0) {
+		if (info.articleSearchList.length > 0) {
 			// generate list items
-			let res = articleListSearch.map(item => {
+			let res = info.articleSearchList.map(item => {
 				return ArticleItem({
 					item,
 					info,
-					BotContext,
-					isSearchMode : true,
+					BotContext
 				});
 			});
 
-			setArticleItemsSearch(res);
+			setArticleItems(res);
 			////console.log("hi res", res);
 		}
-	}, [articleListSearch]);
+	}, [info.articleSearchList]);
 
 	const handleLoadMore = async () => {
 		////console.log("hlm");
 		// last id from current list
-		let l_id = articleListSearch[articleListSearch.length - 1].id;
+		let l_id = info.articleSearchList[info.articleSearchList.length - 1].id;
 		////console.log("l_id", l_id);
-		let it = info.articleSearchIterator;
-		let res = await it.next();
-		////console.log("hlm res", res);
-		if (res.done) {
-			setHasMore(false);
-		} else {
-			res = res.value.reverse();
+		//console.log(values);
+		// search for matching articles
+		let criteria = info.criteria;
+		criteria.id = l_id;
+		try {
+			let res = await getArticleList(BotContext, criteria);
+			
 			//console.log("res value", res);
 			// generate list items
 			let res_reduced = res.reduce((rtn, item) => {
@@ -106,8 +94,12 @@ export default function ArticleSearch(props) {
 				}
 				return rtn;
 			}, []);
-			//console.log("res_reduced", res_reduced);
-			setArticleListSearch([...articleListSearch, ...res_reduced]);
+			info.setArticleSearchList([
+				...info.articleSearchList,
+				...res_reduced
+			]);
+		} catch (err) {
+			console.error(err);
 		}
 	};
 
@@ -125,7 +117,8 @@ export default function ArticleSearch(props) {
 					<IconButton
 						onClick={e => {
 							info.setIndex(0);
-							info.setArticleSearchIterator(null);
+                            info.setArticleSearchList([]);
+                            info.setCriteria({});
 							// force bot to get back to index page
 							BotContext.executeCommand({ type: "index" });
 						}}
@@ -153,9 +146,10 @@ export default function ArticleSearch(props) {
 				<InfiniteScroll
 					style={{ overflow: "inherit" }}
 					scrollableTarget="scrollableDiv1"
-					dataLength={articleItemsSearch.length} //This is important field to render the next data
-					next={handleLoadMore}
-					hasMore={hasMore}
+					dataLength={articleItems.length} //This is important field to render the next data
+                    next={handleLoadMore}
+                    scrollThreshold={0.5}
+					hasMore={hasMore()}
 					loader={
 						<CircularProgress
 							color="secondary"
@@ -164,7 +158,7 @@ export default function ArticleSearch(props) {
 						/>
 					}
 				>
-					{articleItemsSearch}
+					{articleItems}
 				</InfiniteScroll>
 			</Grid>
 		);

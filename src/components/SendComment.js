@@ -72,7 +72,7 @@ export default function SendComment(props) {
 		text = text.trim();
 		if (text.length === 0) return;
 		setIsSending(true);
-		let isSearchMode = info.articleSearchIterator ? true : false;
+		
 		let arg = {
 			type: values.type,
 			text: text,
@@ -81,9 +81,7 @@ export default function SendComment(props) {
 		};
 		// Choose mode.
 		let command = {
-			type: isSearchMode
-				? "commentSearch"
-				: "commentNormal",
+			type: 'comment',
 			arg: arg
 		};
 
@@ -100,7 +98,7 @@ export default function SendComment(props) {
 			let refreshArticleCommentRes = await refreshArticleComment(
 				BotContext,
 				{ ...article },
-				isSearchMode
+				info.criteria
 			);
 			info.setArticle(refreshArticleCommentRes);
 		} catch (err) {

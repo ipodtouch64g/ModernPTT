@@ -21,7 +21,8 @@ import Divider from "@material-ui/core/Divider";
 import Button from "@material-ui/core/Button";
 import CloseIcon from "@material-ui/icons/Close";
 import Typography from "@material-ui/core/Typography";
-import { getArticleListIterator } from "./utils/article";
+import { getArticleList } from "./utils/article";
+import { useProgressContext } from "./ProgressContext";
 
 export default function ArticleSelect(props) {
 	const useStyles = makeStyles(theme => ({
@@ -99,6 +100,7 @@ export default function ArticleSelect(props) {
 	
 	const [articleItems, setArticleItems] = useState([]);
 	
+	const { setIsSnackbarOpen, setSnackbarContent } = useProgressContext();
 
 	useEffect(() => {
 		if (info.articleList.length > 0) {
@@ -129,9 +131,16 @@ export default function ArticleSelect(props) {
 		};
 		info.setCriteria(criteria);
 		try {
-			let res = await getArticleListIterator(BotContext, criteria);
-			//console.log(res);
-			info.setArticleSearchIterator(res);
+			let res = await getArticleList(BotContext, criteria);
+			console.log(res);
+			if(res.length > 0) {
+				info.setArticleSearchList(res);
+				info.setIndex(1);
+			}else{
+				setIsSnackbarOpen(true);
+				setSnackbarContent({severity:'error',text:'搜尋不到東西！'});
+				info.setCriteria({});
+			}
 			toggleSearchForm();
 		} catch (err) {
 			console.error(err);

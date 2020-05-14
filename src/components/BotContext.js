@@ -13,7 +13,7 @@ const useBot = () => {
 	const [botState, setBotState] = useState(bot.state);
 	const prevBotState = usePrev(botState);
 
-	const { setIsSnackbarOpen, setSnackbarContent } = useProgressContext();
+	// const { setIsSnackbarOpen, setSnackbarContent } = useProgressContext();
 
 	bot.on("connect", () => {
 		//console.log("bot connected");
@@ -39,8 +39,8 @@ const useBot = () => {
 	// bot command
 	const executeCommand = async command => {
 		if (busy) {
-			setSnackbarContent({severity:'info',text:'等！'})
-			setIsSnackbarOpen(true)
+			// setSnackbarContent({severity:'info',text:'等！'})
+			// setIsSnackbarOpen(true)
 			return Promise.reject('bot is busy!');
 		}
 		busy = true;
@@ -69,48 +69,24 @@ const useBot = () => {
 				busy = false;
 				return res;
 			}
-			// articleListIterator
-			if (command.type === "selectIterator") {
-				if (!botState.login) return false;
-				let query = command.arg;
-				let iterator = query.getIterator();
-				// BUG!BUG!BUG!BUG!BUG!BUG!
-				busy = false;
-				// BUG!BUG!BUG!BUG!BUG!BUG!
-				return iterator;
-			}
-			// content in normal mode
-			if (command.type === "contentNormal") {
+			
+			// content 
+			if (command.type === "content") {
 				if (!botState.login) return false;
 				let query = command.arg;
 				let res = await query.getOne();
 				busy = false;
 				return res;
 			}
-			// content in search mode
-			if (command.type === "contentSearch") {
-				if (!botState.login) return false;
-				let query = command.arg;
-				let res = await query.getOneInSearch();
-				busy = false;
-				return res;
-			}
+			
 			// comment in normal mode
-			if (command.type === "commentNormal") {
+			if (command.type === "comment") {
 				if (!botState.login) return false;
 				await bot.sendComment(command.arg);
 				busy = false;
 				return true;
 			}
 
-			// comment in search mode
-			if (command.type === "commentSearch") {
-				if (!botState.login) return false;
-				await bot.sendCommentSearchMode(command.arg);
-				busy = false;
-				return true;
-			}
-			
 		} catch(err) {
 			busy = false;
 			return Promise.reject(err);

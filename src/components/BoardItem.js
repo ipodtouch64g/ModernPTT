@@ -15,12 +15,14 @@ export default function BoardItem(props) {
 	const handleClick = async () => {
 		//console.log("boardItem click", item, info, BotContext);
 		try {
-			let res = await getArticleList(BotContext,item.name);
+			let criteria = {boardname : item.name};
+			let res = await getArticleList(BotContext,criteria);
 			info.setArticleList(res);
 			info.setBoardName(item.name);
 			info.setIndex(0);
+			info.setCriteria({});
 			// clear search
-			info.setArticleSearchIterator(null);
+			info.setArticleSearchList([]);
 		}catch(err) {
 			console.error(err);
 		}
