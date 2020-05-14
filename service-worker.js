@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/ModernPTT/precache-manifest.3ba8411e0d83d215d4079660df51fae5.js"
+  "/ModernPTT/precache-manifest.e94a8e2fdacad5fce8e69787e17d1418.js"
 );
 
 self.addEventListener('message', (event) => {
