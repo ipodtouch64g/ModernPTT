@@ -23,6 +23,8 @@ const useArticleBoardInfo = () => {
 
 	const [articleList, setArticleList] = useState([]);
 	const [index, setIndex] = useState(0);
+	const [articleSearchIterator, setArticleSearchIterator] = useState(null);
+	const [criteria, setCriteria] = useState({});
 	const info = {
 		boardName: boardName,
 		setBoardName: setBoardName,
@@ -31,7 +33,11 @@ const useArticleBoardInfo = () => {
 		articleList: articleList,
 		setArticleList: setArticleList,
 		index: index,
-		setIndex: setIndex
+		setIndex: setIndex,
+		articleSearchIterator : articleSearchIterator,
+		setArticleSearchIterator : setArticleSearchIterator,
+		criteria: criteria,
+		setCriteria : setCriteria
 	};
 
 	return info;

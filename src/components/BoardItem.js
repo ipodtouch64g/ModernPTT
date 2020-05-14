@@ -15,7 +15,7 @@ export default function BoardItem(props) {
 	const handleClick = async () => {
 		console.log("boardItem click", item, info, BotContext);
 		try {
-			let res = await getArticleList(BotContext,{boardname:item.name});
+			let res = await getArticleList(BotContext,item.name);
 			info.setArticleList(res);
 			info.setBoardName(item.name);
 			info.setIndex(0);

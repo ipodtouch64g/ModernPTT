@@ -21,7 +21,7 @@ import Divider from "@material-ui/core/Divider";
 import Button from "@material-ui/core/Button";
 import CloseIcon from "@material-ui/icons/Close";
 import Typography from "@material-ui/core/Typography";
-import { getArticleList } from "./utils/article";
+import { getArticleListIterator } from "./utils/article";
 
 export default function ArticleSelect(props) {
 	const useStyles = makeStyles(theme => ({
@@ -93,8 +93,12 @@ export default function ArticleSelect(props) {
 	const classes = useStyles();
 	const info = useArticleBoardInfoContext();
 	const BotContext = useBotContext();
-	const [isArticleSearchOpen, setIsArticleSearchOpen] = useState(false);
+	const [isArticleSearchFormOpen, setIsArticleSearchFormOpen] = useState(
+		false
+	);
+	
 	const [articleItems, setArticleItems] = useState([]);
+	
 
 	useEffect(() => {
 		if (info.articleList.length > 0) {
@@ -106,12 +110,15 @@ export default function ArticleSelect(props) {
 		}
 	}, [info]);
 
-	const handleClickSearch = () => {
-		setIsArticleSearchOpen(isArticleSearchOpen => !isArticleSearchOpen);
+	
+	const toggleSearchForm = () => {
+		setIsArticleSearchFormOpen(
+			isArticleSearchFormOpen => !isArticleSearchFormOpen
+		);
 	};
 	const { handleSubmit, control, errors } = useForm();
-	// console.log(errors);
-	const onSubmit = async values => {
+
+	const onSubmitSearch = async values => {
 		console.log(values);
 		// search for matching articles
 		let criteria = {
@@ -120,15 +127,17 @@ export default function ArticleSelect(props) {
 			author: values.author,
 			push: values.push
 		};
+		info.setCriteria(criteria);
 		try {
-			let res = await getArticleList(BotContext,criteria);
-			info.setArticleList(res);
-			console.log(res)
-			handleClickSearch();
+			let res = await getArticleListIterator(BotContext, criteria);
+			console.log(res);
+			info.setArticleSearchIterator(res);
+			toggleSearchForm();
 		} catch (err) {
 			console.log(err);
 		}
 	};
+
 	const handleLoadMore = () => {
 		// prevent default action
 		if (info.articleList.length === 0) return;
@@ -171,17 +180,19 @@ export default function ArticleSelect(props) {
 				<Grid container>
 					<Backdrop
 						className={classes.backdrop}
-						open={isArticleSearchOpen}
+						open={isArticleSearchFormOpen}
 						invisible={true}
 					>
 						<ClickAwayListener
-							mouseEvent={isArticleSearchOpen ? "onClick" : false}
-							onClickAway={handleClickSearch}
+							mouseEvent={
+								isArticleSearchFormOpen ? "onClick" : false
+							}
+							onClickAway={toggleSearchForm}
 						>
 							<Paper elevation={4} className={classes.paper}>
 								<IconButton
 									className={classes.closeIcon}
-									onClick={handleClickSearch}
+									onClick={toggleSearchForm}
 								>
 									<CloseIcon />
 								</IconButton>
@@ -195,7 +206,7 @@ export default function ArticleSelect(props) {
 									orientation="horizontal"
 								/>
 								<form
-									onSubmit={handleSubmit(onSubmit)}
+									onSubmit={handleSubmit(onSubmitSearch)}
 									className={classes.form}
 									noValidate
 									autoComplete="off"
@@ -231,7 +242,7 @@ export default function ArticleSelect(props) {
 										}
 										rules={{
 											pattern: {
-												value: /[0-9]*/
+												value: /\b\d{0,6}\b/
 											}
 										}}
 										name="push"
@@ -257,8 +268,10 @@ export default function ArticleSelect(props) {
 					</Grid>
 
 					<Fab color="secondary" className={classes.searchFab}>
-						<SearchIcon onClick={handleClickSearch} />
+						<SearchIcon onClick={toggleSearchForm} />
 					</Fab>
+					
+					{/* general list: not search */}
 					<InfiniteScroll
 						style={{ overflow: "inherit" }}
 						scrollableTarget="scrollableDiv"

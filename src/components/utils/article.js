@@ -113,22 +113,15 @@ const refreshArticleComment = async (BotContext, newArticleContent) => {
 	return newArticleContent;
 };
 
-// Get articleList based on searching criteria
-// criteria = { boardname:'',
-//  			title:'',
-//   			author:'',
-//    			push:''
-// 			  }
-const getArticleList = async (BotContext, criteria) => {
+// Get articleList based on boardname
+
+const getArticleList = async (BotContext, boardname) => {
 	try {
 		// build query based on criteria
 		let query = BotContext.bot
 			.select(ArticleModel)
-			.where("boardname", criteria.boardname);
-		if (criteria.title) query.where("title", criteria.title);
-		if (criteria.author) query.where("author", criteria.author);
-		if (criteria.push) query.where("push", criteria.push);
-
+			.where("boardname", boardname);
+		
 		let res = await BotContext.executeCommand({
 			type: "select",
 			arg: query
@@ -139,4 +132,31 @@ const getArticleList = async (BotContext, criteria) => {
 	}
 };
 
-export { parseArticle, refreshArticleComment, getArticleList };
+
+// Get articleList based on searching criteria
+// criteria = { boardname:'',
+//  			title:'',
+//   			author:'',
+//    			push:''
+// 			  }
+const getArticleListIterator = async (BotContext, criteria) => {
+	try {
+		// build query based on criteria
+		let query = BotContext.bot
+			.select(ArticleModel)
+			.where("boardname", criteria.boardname);
+		if (criteria.title) query.where("title", criteria.title);
+		if (criteria.author) query.where("author", criteria.author);
+		if (criteria.push) query.where("push", criteria.push);
+		// res will be an iterator
+		let res = await BotContext.executeCommand({
+			type: "selectIterator",
+			arg: query
+		});
+		return res;
+	} catch (err) {
+		return Promise.reject(err);
+	}
+};
+
+export { parseArticle, refreshArticleComment, getArticleList,getArticleListIterator };

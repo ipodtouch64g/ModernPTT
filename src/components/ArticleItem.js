@@ -16,11 +16,12 @@ export default function ArticleItem(props) {
 	const handleClick = async () => {
 		// handle deleted article
 		if(item.title.startsWith("(本文已被刪除)")) return;
+		if(item.author.startsWith("-")) return;
 		console.log("article item click:", info, item, BotContext);
 		try {
 			let t1 = performance.now();
 			let article = await parseArticle(item,BotContext);
-			info.setIndex(1);
+			info.setIndex(2);
 			info.setArticle(article);
 			let t2 = performance.now();
 			console.log("article load time",t2-t1);

@@ -154,7 +154,7 @@ export default function ArticleDisplay(props) {
 
 	// go back to top when load new article
 	useEffect(() => {
-		if (info.index === 1) {
+		if (info.index === 2) {
 			ref.current.scrollTop = 0;
 		}
 	}, [info.index]);
@@ -165,7 +165,7 @@ export default function ArticleDisplay(props) {
 			{info.index ? (
 				<IconButton
 					onClick={e => {
-						info.setIndex(0);
+						info.setIndex(info.articleSearchIterator ? 1 : 0);
 					}}
 					className={classes.goback}
 				>

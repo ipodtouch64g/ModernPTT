@@ -36,7 +36,6 @@ const useBot = () => {
 	};
 
 	// bot command
-	// command = {type : "login"|"select"|"content"|"comment", arg : query | userObject}
 	const executeCommand = async command => {
 		if (busy) {
 			setSnackbarContent({severity:'info',text:'等！'})
@@ -47,7 +46,13 @@ const useBot = () => {
 		console.log("bot command : ", command);
 		try {
 			// not connected
-			if (!botState.connect) return Promise.reject('not login!');;
+			if (!botState.connect) return Promise.reject('not login!');
+			// go back to index
+			if (command.type === "index") {
+				await bot.enterIndex();
+				busy = false;
+				return true;
+			}
 			// login
 			if (command.type === "login") {
 				if (botState.login) return true;
@@ -55,13 +60,23 @@ const useBot = () => {
 				busy = false;
 				return res;
 			}
-			// select
+			// articleList
 			if (command.type === "select") {
 				if (!botState.login) return false;
 				let query = command.arg;
 				let res = await query.get();
 				busy = false;
 				return res;
+			}
+			// articleListIterator
+			if (command.type === "selectIterator") {
+				if (!botState.login) return false;
+				let query = command.arg;
+				let iterator = query.getIterator();
+				// BUG!BUG!BUG!BUG!BUG!BUG!
+				busy = false;
+				// BUG!BUG!BUG!BUG!BUG!BUG!
+				return iterator;
 			}
 			// content
 			if (command.type === "content") {

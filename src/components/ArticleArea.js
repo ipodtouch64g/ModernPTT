@@ -8,6 +8,7 @@ import SwipeableViews from 'react-swipeable-views';
 import ArticleDisplay from './ArticleDisplay';
 import ArticleSelect from './ArticleSelect';
 import { useArticleBoardInfoContext } from "./ArticleBoardInfoContext";
+import ArticleSearch from "./ArticleSearch";
 
 
 export default function ArticleArea() {
@@ -32,6 +33,7 @@ export default function ArticleArea() {
   return(
     <SwipeableViews index={info.index} onChangeIndex={handleChangeIndex}>
       <ArticleSelect/>
+      <ArticleSearch/>
       <ArticleDisplay/>
     </SwipeableViews>
     
