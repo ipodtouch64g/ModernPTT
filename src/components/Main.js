@@ -31,7 +31,10 @@ const theme = createMuiTheme({
 			fontSize: "1rem",
 			fontWeight: "bold"
 		}
-	}
+	},
+	palette: {
+    type: 'dark',
+  },
 });
 
 const useStyles = makeStyles(theme => ({
