@@ -16,6 +16,8 @@ export default function BoardItem(props) {
 		//console.log("boardItem click", item, info, BotContext);
 		try {
 			let criteria = {boardname : item.name};
+			info.setArticleList([]);
+			info.sethaveSelectBoard(true);
 			let res = await getArticleList(BotContext,criteria);
 			info.setArticleList(res);
 			info.setBoardName(item.name);

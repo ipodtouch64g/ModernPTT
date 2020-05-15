@@ -182,8 +182,16 @@ export default function ArticleSelect(props) {
 		>
 			<CssBaseline />
 
-			<Grid item className={classes.skeleton}>
-				{info.articleList.length === 0 && <Skeleton count={3} />}
+			<Grid item className={classes.skeleton} alignItems="center" justify="center" alignContent='center'>
+				{info.articleList.length === 0 && (info.haveSelectBoard?
+					<Grid container className={classes.skeleton} alignItems="center" justify="center" alignContent='center'>
+					<CircularProgress
+						className={classes.circle}
+						color="secondary"
+					/>
+					</Grid>
+					:<Skeleton count={3} />)}
+
 			</Grid>
 			{info.articleList.length > 0 && (
 				<Grid container>
