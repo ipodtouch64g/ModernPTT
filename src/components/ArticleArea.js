@@ -14,9 +14,7 @@ import ArticleSearch from "./ArticleSearch";
 export default function ArticleArea() {
   const useStyles = makeStyles(theme => ({
 		root: {
-			maxHeight: "80vh",
-			
-			overflow: "auto"
+			width:'100%',
 		},
 		skeleton: {
 			fontSize: "40px",
@@ -31,7 +29,7 @@ export default function ArticleArea() {
     info.setIndex(i);
   }
   return(
-    <SwipeableViews index={info.index} onChangeIndex={handleChangeIndex}>
+    <SwipeableViews index={info.index} onChangeIndex={handleChangeIndex} className={classes.root}>
       <ArticleSelect/>
       <ArticleSearch/>
       <ArticleDisplay/>

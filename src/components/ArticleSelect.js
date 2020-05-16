@@ -88,6 +88,9 @@ export default function ArticleSelect(props) {
 		saTitle: {
 			textAlign: "center",
 			margin: "24px"
+		},
+		list: {
+			width:'100%',
 		}
 	}));
 
@@ -97,9 +100,9 @@ export default function ArticleSelect(props) {
 	const [isArticleSearchFormOpen, setIsArticleSearchFormOpen] = useState(
 		false
 	);
-	
+
 	const [articleItems, setArticleItems] = useState([]);
-	
+
 	const { setIsSnackbarOpen, setSnackbarContent } = useProgressContext();
 
 	useEffect(() => {
@@ -112,7 +115,6 @@ export default function ArticleSelect(props) {
 		}
 	}, [info]);
 
-	
 	const toggleSearchForm = () => {
 		setIsArticleSearchFormOpen(
 			isArticleSearchFormOpen => !isArticleSearchFormOpen
@@ -133,12 +135,15 @@ export default function ArticleSelect(props) {
 		try {
 			let res = await getArticleList(BotContext, criteria);
 			console.log(res);
-			if(res.length > 0) {
+			if (res.length > 0) {
 				info.setArticleSearchList(res);
 				info.setIndex(1);
-			}else{
+			} else {
 				setIsSnackbarOpen(true);
-				setSnackbarContent({severity:'error',text:'搜尋不到東西！'});
+				setSnackbarContent({
+					severity: "error",
+					text: "搜尋不到東西！"
+				});
 				info.setCriteria({});
 			}
 			toggleSearchForm();
@@ -182,19 +187,27 @@ export default function ArticleSelect(props) {
 		>
 			<CssBaseline />
 
-			<Grid item className={classes.skeleton} alignItems="center" justify="center" alignContent='center'>
-				{info.articleList.length === 0 && (info.haveSelectBoard?
-					<Grid container className={classes.skeleton} alignItems="center" justify="center" alignContent='center'>
-					<CircularProgress
-						className={classes.circle}
-						color="secondary"
-					/>
-					</Grid>
-					:<Skeleton count={3} />)}
-
+			<Grid
+				item
+				className={classes.skeleton}
+				alignItems="center"
+				justify="center"
+				alignContent="center"
+			>
+				{info.articleList.length === 0 &&
+					(info.haveSelectBoard ? (
+						<Grid container className={classes.skeleton} alignItems="center" justify="center" alignContent='center'>
+						<CircularProgress
+							className={classes.circle}
+							color="secondary"
+						/>
+						</Grid>):
+						<Skeleton count={3} />
+					)
+				}
 			</Grid>
 			{info.articleList.length > 0 && (
-				<Grid container>
+				<Grid container className={classes.list}>
 					<Backdrop
 						className={classes.backdrop}
 						open={isArticleSearchFormOpen}
@@ -287,8 +300,7 @@ export default function ArticleSelect(props) {
 					<Fab color="secondary" className={classes.searchFab}>
 						<SearchIcon onClick={toggleSearchForm} />
 					</Fab>
-					
-					{/* general list: not search */}
+
 					<InfiniteScroll
 						style={{ overflow: "inherit" }}
 						scrollableTarget="scrollableDiv"
@@ -301,11 +313,6 @@ export default function ArticleSelect(props) {
 								size={12}
 								className={classes.loading}
 							/>
-						}
-						endMessage={
-							<p style={{ textAlign: "center" }}>
-								<b>Yay! You have seen it all</b>
-							</p>
 						}
 					>
 						{articleItems}

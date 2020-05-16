@@ -5,7 +5,7 @@ import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import Typography from "@material-ui/core/Typography";
-import {getArticleList} from './utils/article'
+import { getArticleList } from "./utils/article";
 
 export default function BoardItem(props) {
 	let item = props.item;
@@ -15,20 +15,24 @@ export default function BoardItem(props) {
 	const handleClick = async () => {
 		//console.log("boardItem click", item, info, BotContext);
 		try {
-			let criteria = {boardname : item.name};
+			let criteria = { boardname: item.name };
 			info.setArticleList([]);
 			info.sethaveSelectBoard(true);
-			let res = await getArticleList(BotContext,criteria);
+			// scroll to top of this article: prevent reenter bug
+			await BotContext.executeCommand({ type: "top" });
+			// very important to get back to index
+			await BotContext.executeCommand({ type: "index" });
+			let res = await getArticleList(BotContext, criteria);
+
 			info.setArticleList(res);
 			info.setBoardName(item.name);
 			info.setIndex(0);
 			info.setCriteria({});
 			// clear search
 			info.setArticleSearchList([]);
-		}catch(err) {
+		} catch (err) {
 			console.error(err);
 		}
-		
 	};
 
 	return (

@@ -5,29 +5,37 @@ import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import Typography from "@material-ui/core/Typography";
-import {parseArticle,refreshArticleComment} from "./utils/article"
+import { parseArticleLines, initArticle } from "./utils/article";
 
 export default function ArticleItem(props) {
-
 	let item = props.item;
 	let info = props.info;
 	let BotContext = props.BotContext;
 
 	const handleClick = async () => {
 		// handle deleted article
-		if(item.title.startsWith("(本文已被刪除)")) return;
-		if(item.author.startsWith("-")) return;
+		if (item.title.startsWith("(本文已被刪除)")) return;
+		if (item.author.startsWith("-")) return;
 		console.log("article item click:", info, item, BotContext);
 		try {
-			let t1 = performance.now();
 			let article;
-			article = await parseArticle(item,BotContext,info.criteria);
-
+			// block load version
+			// article = await parseArticle(item,BotContext);
+			// iterator version
+			performance.mark("handleClick");
+			article = await initArticle(item, BotContext);
+			console.log("article", article);
+			performance.mark("setArticle");
 			info.setIndex(2);
 			info.setArticle(article);
-			let t2 = performance.now();
-			console.log("article load time",t2-t1);
-		} catch(err) {
+			performance.measure("handleclick", "handleClick");
+			performance.measure("setArticle", "setArticle");
+			performance.getEntriesByType("measure").forEach((e)=>{
+				console.log(e);
+			})
+			performance.clearMarks();
+			performance.clearMeasures();
+		} catch (err) {
 			console.error(err);
 		}
 	};

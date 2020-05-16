@@ -13,12 +13,10 @@ const useArticleBoardInfo = () => {
 			author: "",
 			boardname: "",
 			timestamp: "",
-			commentStartIndex: -1,
 			title: "",
-			ip: ""
 		},
-		content: [],
-		comment: []
+		lines:[],
+		iterator:null,
 	});
 
 	const [articleList, setArticleList] = useState([]);

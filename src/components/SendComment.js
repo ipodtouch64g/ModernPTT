@@ -23,7 +23,9 @@ export default function SendComment(props) {
 			width: "100%",
 			paddingLeft: "4vw",
 			paddingRight: "2vw",
-			paddingBottom: "12px"
+			paddingBottom: "12px",
+			paddingTop:'12px',
+			minHeight: '12vh'
 		},
 		divider: {
 			height: "100%",
@@ -57,8 +59,8 @@ export default function SendComment(props) {
 
 	const info = useArticleBoardInfoContext();
 	const article = info.article;
-
-	const classes = useStyles();
+	const setHasMore = props.setHasMore;
+ 	const classes = useStyles();
 	const BotContext = useBotContext();
 	const [isSending, setIsSending] = useState(false);
 	const { handleSubmit, control } = useForm();
@@ -79,31 +81,21 @@ export default function SendComment(props) {
 			boardName: article.info.boardname,
 			aid: article.info.aid
 		};
-		// Choose mode.
-		let command = {
-			type: 'comment',
-			arg: arg
-		};
 
 		try {
-			await BotContext.executeCommand(command);
+			await article.sendComment(arg,BotContext.bot);
+			article.iterator.reset();
+			info.setArticle({
+				...article,
+				lines: [],
+				commentStartFloor: 1,
+			});
+			setHasMore(true);
 		} catch (err) {
 			console.error(err);
 			return;
 		}
 
-		// reload this article
-		//console.log("reload", article);
-		try {
-			let refreshArticleCommentRes = await refreshArticleComment(
-				BotContext,
-				{ ...article },
-				info.criteria
-			);
-			info.setArticle(refreshArticleCommentRes);
-		} catch (err) {
-			console.error(err);
-		}
 		setIsSending(false);
 	};
 
@@ -116,7 +108,7 @@ export default function SendComment(props) {
 				autoComplete="off"
 			>
 				<FormControl className={classes.type}>
-					<InputLabel>推文類型</InputLabel>
+					<InputLabel>類型</InputLabel>
 
 					<Controller
 						as={

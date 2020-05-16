@@ -115,12 +115,12 @@ export default function ArticleSearch(props) {
 				<CssBaseline />
 				<Grid className={classes.buttoninfo} item>
 					<IconButton
-						onClick={e => {
+						onClick={async (e) => {
+							// force bot to get back to index page
+							await BotContext.executeCommand({ type: "index" });
 							info.setIndex(0);
                             info.setArticleSearchList([]);
                             info.setCriteria({});
-							// force bot to get back to index page
-							BotContext.executeCommand({ type: "index" });
 						}}
 						className={classes.goback}
 					>

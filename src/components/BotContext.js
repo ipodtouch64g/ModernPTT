@@ -54,6 +54,13 @@ const useBot = () => {
 				busy = false;
 				return true;
 			}
+			// go to top of article
+			if (command.type === "top") {
+				await bot.goToTop();
+				busy = false;
+				return true;
+			}
+
 			// login
 			if (command.type === "login") {
 				if (botState.login) return true;
@@ -78,14 +85,22 @@ const useBot = () => {
 				busy = false;
 				return res;
 			}
-			
-			// comment in normal mode
-			if (command.type === "comment") {
+
+			if(command.type === "contentIterator") {
 				if (!botState.login) return false;
-				await bot.sendComment(command.arg);
+				let query = command.arg;
+				let res = await query.getOneIterator();
 				busy = false;
-				return true;
+				return res;
 			}
+			
+			// // comment in normal mode
+			// if (command.type === "comment") {
+			// 	if (!botState.login) return false;
+			// 	await bot.sendComment(command.arg);
+			// 	busy = false;
+			// 	return true;
+			// }
 
 		} catch(err) {
 			busy = false;

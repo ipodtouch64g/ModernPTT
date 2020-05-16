@@ -9,7 +9,10 @@ import IconButton from "@material-ui/core/IconButton";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import { List, ListItem, ListItemText } from "@material-ui/core";
 import SendComment from "./SendComment";
-
+import InfiniteScroll from "react-infinite-scroll-component";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import { parseArticleLines } from "./utils/article";
+import { useBotContext } from "./BotContext";
 export default function ArticleDisplay(props) {
 	const useStyles = makeStyles(theme => ({
 		root: {
@@ -42,130 +45,132 @@ export default function ArticleDisplay(props) {
 			flexGrow: "0",
 			flexShrink: "0"
 		},
-		content: {
-			paddingLeft: "4vw",
-			paddingRight: "4vw",
-			borderBottom: "2px solid rgba(0, 0, 0, 0.12)"
+
+		sendComment: {
+			position: "absolute",
+			bottom: 0,
+			backgroundColor: theme.palette.background.paper
 		},
-		comment: {},
 		author: {
 			alignSelf: "center"
 		},
-		commentlist: {
+
+		scrollBottom: {
+			paddingBottom: "12vh"
+		},
+		infScroll: {
+			overflow: "inherit",
 			paddingTop: 0,
-			width: "100%"
-		},
-		contentlist: {
-			width: "100%"
-		},
-		commentlist_item: {
+			width: "100%",
 			paddingLeft: "4vw",
 			paddingRight: "2vw"
-		},
-		commentlist_type: {
-			flexBasis: "5%"
-		},
-		commentlist_author: {
-			flexBasis: "20%"
-		},
-		commentlist_text: {
-			flexBasis: "65%"
-		},
-		commentlist_timestamp: {
-			flexBasis: "10%"
-		},
-
-		lit: {
-			whiteSpace: "pre"
 		}
 	}));
 
 	const info = useArticleBoardInfoContext();
 	const article = info.article;
 	const classes = useStyles();
-
-	// Todo : 1. 排版會跑掉
-	//		  2. 自動開圖
-	//
-	const genContentList = content => {
-		if (content) {
-			let res = content.map((item,index) => {
-				return (
-					<ListItem key={index} disableGutters={true} className={classes.lit}>
-						<ListItemText primary={item} />
-					</ListItem>
-				);
-			});
-
-			return <List className={classes.contentlist}>{res}</List>;
-		}
-		return "";
-	};
-
-	const genCommentList = comment => {
-		if (comment) {
-			let res = comment.map(item => {
-				return (
-					<ListItem
-						disableGutters={true}
-						divider={true}
-						className={classes.commentlist_item}
-						key={item.floor}
-					>
-						{item.type ? (
-							<ListItemText
-								className={classes.commentlist_type}
-								primary={item.type}
-							/>
-						) : (
-							""
-						)}
-						{item.author ? (
-							<ListItemText
-								className={classes.commentlist_author}
-								primary={item.author}
-							/>
-						) : (
-							""
-						)}
-
-						<ListItemText
-							className={classes.commentlist_text}
-							primary={item.text}
-						/>
-						{item.timestamp ? (
-							<ListItemText
-								className={classes.commentlist_timestamp}
-								primary={item.floor + "F"}
-								secondary={item.timestamp}
-							/>
-						) : (
-							""
-						)}
-					</ListItem>
-				);
-			});
-			return <List className={classes.commentlist}>{res}</List>;
-		}
-		return "";
-	};
+	const BotContext = useBotContext();
 
 	const ref = React.createRef();
-
+	const [hasMore, setHasMore] = useState(true);
 	// go back to top when load new article
 	useEffect(() => {
 		if (info.index === 2) {
 			ref.current.scrollTop = 0;
+		} else {
+			// when exist article display always set hasmore = true
+			// fix next article not load more bug
+			console.log("exit display");
+			setHasMore(true);
 		}
 	}, [info.index]);
 
+	const handleLoadMore = async () => {
+		// prevent default action
+		// if (article.lines.length === 0) return;
+		// call the iterator
+		console.log("loadmore");
+
+		try {
+			performance.mark("iterator.next()");
+			let res = await article.iterator.next();
+			performance.mark("iterator.next() finished");
+			console.log("res", res);
+			// all loaded
+			if (res.done) {
+				setHasMore(false);
+				return;
+			}
+			// parse lines
+			res = res.value;
+			// parse other lines
+			performance.mark("parseLines");
+			let parsed = parseArticleLines(
+				res,
+				article.commentStartFloor,
+				article.lines.length
+			);
+			performance.mark("parseLines finished");
+			let newLines = [...article.lines, ...parsed[0]];
+			let newCommentStartFloor = parsed[1];
+			console.log("article", article);
+			console.log("newLines", newLines);
+			console.log("newCommentStartFloor", newCommentStartFloor);
+			performance.mark("setArticle");
+			info.setArticle({
+				...article,
+				lines: newLines,
+				commentStartFloor: newCommentStartFloor
+			});
+			performance.mark("setArticle finished");
+			performance.measure(
+				"iterator",
+				"iterator.next()",
+				"iterator.next() finished"
+			);
+			performance.measure(
+				"parselines",
+				"parseLines",
+				"parseLines finished"
+			);
+			performance.measure(
+				"setarticle",
+				"setArticle",
+				"setArticle finished"
+			);
+			performance.getEntriesByType("measure").forEach(e => {
+				console.log(e);
+			});
+
+			performance.clearMarks();
+			performance.clearMeasures();
+			setHasMore(true);
+		} catch (err) {
+			console.error(err);
+		}
+	};
+
 	return (
-		<Grid container ref={ref} component="main" className={classes.root}>
+		<Grid
+			container
+			ref={ref}
+			component="main"
+			id="scrollableDiv2"
+			className={classes.root}
+		>
 			<CssBaseline />
 			{info.index ? (
 				<IconButton
-					onClick={e => {
-						info.setIndex(info.articleSearchList.length > 0 ? 1 : 0);
+					onClick={async () => {
+						// scroll to top of this article: prevent reenter bug
+						await BotContext.executeCommand({ type: "top" });
+						// very important to get back to index
+						await BotContext.executeCommand({ type: "index" });
+						setHasMore(true);
+						info.setIndex(
+							info.articleSearchList.length > 0 ? 1 : 0
+						);
 					}}
 					className={classes.goback}
 				>
@@ -190,21 +195,28 @@ export default function ArticleDisplay(props) {
 					<Typography className={classes.timestamp} variant={"body2"}>
 						・{article.info.timestamp}
 					</Typography>
-					<Typography className={classes.ip} variant={"body2"}>
-						・來自：{article.info.ip}
-					</Typography>
 				</Grid>
 			</Grid>
-			<Grid container className={classes.content}>
-				{genContentList(article.content)}
-			</Grid>
-
-			<Grid container className={classes.comment}>
-				{genCommentList(article.comment)}
-			</Grid>
+			<InfiniteScroll
+				className={classes.infScroll}
+				scrollableTarget="scrollableDiv2"
+				dataLength={article.lines.length} //This is important field to render the next data
+				next={handleLoadMore}
+				hasMore={hasMore}
+				loader={
+					<CircularProgress
+						color="secondary"
+						size={12}
+						className={classes.loading}
+					/>
+				}
+			>
+				{article.lines}
+			</InfiniteScroll>
+			<Grid container className={classes.scrollBottom} />
 
 			<Grid container className={classes.sendComment}>
-				<SendComment />
+				<SendComment setHasMore={setHasMore} />
 			</Grid>
 		</Grid>
 	);

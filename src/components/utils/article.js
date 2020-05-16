@@ -1,9 +1,85 @@
 import { Article as ArticleModel } from "ptt-client/dist/sites/ptt/model";
 import { URL2AID } from "./decode";
-
-const parseArticle = async (articleItem, BotContext,criteria) => {
+import ArticleCommentItem from "../ArticleCommentItem";
+import ArticleContentItem from "../ArticleContentItem";
+const initArticle = async (articleItem, BotContext) => {
 	try {
-		let newArticleContent = {
+		let article = {
+			info: {
+				id: "",
+				aid: "",
+				author: "",
+				boardname: "",
+				timestamp: "",
+				title: "",
+				ip: ""
+			},
+			lines: [],
+			iterator: null,
+			sendComment: null
+		};
+		article.info.boardname = articleItem.boardname;
+		article.info.id = articleItem.id;
+		article.info.title = articleItem.title;
+		article.info.author = articleItem.author;
+
+		let res = await getArticleResponseIterator(BotContext, article);
+
+		// call the iterator to get info first
+		article.iterator = res.iterator;
+		let firstPartOfContent = await article.iterator.next();
+		firstPartOfContent = firstPartOfContent.value;
+		// parse header
+		if (
+			firstPartOfContent.length > 0 &&
+			firstPartOfContent[0].str.includes("作者")
+		) {
+			article.info.author = firstPartOfContent[0].str
+				.substring(4, 50)
+				.trim();
+			article.info.timestamp = firstPartOfContent[2].str
+				.substring(3)
+				.trim();
+			// get rid of first four lines
+			firstPartOfContent = firstPartOfContent.slice(4);
+		}
+		// parse other lines
+		[article.lines, article.commentStartFloor] = parseArticleLines(
+			firstPartOfContent,
+			1,
+			0
+		);
+
+		article.sendComment = res.sendComment;
+		return article;
+	} catch (err) {
+		return Promise.reject(err);
+	}
+};
+
+const getArticleResponseIterator = async (BotContext, article) => {
+	let query = BotContext.bot
+		.select(ArticleModel)
+		.where("boardname", article.info.boardname)
+		.where("author", article.info.author)
+		.where("title", article.info.title)
+		.where("id", article.info.id);
+	console.log("q", query);
+
+	let res = await BotContext.executeCommand({
+		type: "contentIterator",
+		arg: query
+	});
+	if (!res) return Promise.reject("getArticleResponse err.");
+	console.log(res);
+	return res;
+};
+
+
+
+const parseArticle = async (articleItem, BotContext) => {
+	try {
+		let article = {
 			info: {
 				id: "",
 				aid: "",
@@ -17,49 +93,39 @@ const parseArticle = async (articleItem, BotContext,criteria) => {
 			content: [],
 			comment: []
 		};
-		newArticleContent.info.boardname = articleItem.boardname;
-		newArticleContent.info.id = articleItem.id;
-		newArticleContent.info.title = articleItem.title;
+		article.info.boardname = articleItem.boardname;
+		article.info.id = articleItem.id;
+		article.info.title = articleItem.title;
+		article.info.author = articleItem.author;
+		let res = await getArticleResponse(BotContext, article);
 
-		let res = await getArticleResponse(
-			BotContext,
-			newArticleContent,
-			criteria
-		);
+		article.info.aid = "";
 
-		newArticleContent.info.aid = "";
-		newArticleContent.info.author = res.author;
-		newArticleContent.info.timestamp = res.timestamp;
-		newArticleContent.info.commentStartIndex = -1;
-		newArticleContent.info.title = res.title;
-		newArticleContent.info.ip = "";
-		newArticleContent.content = [];
-		newArticleContent.comment = [];
-		parseArticleInfoAndContent(res, newArticleContent);
-		parseArticleComment(res, newArticleContent);
-		// //console.log(newArticleContent);
-		return newArticleContent;
+		article.info.timestamp = res.timestamp;
+		article.info.commentStartIndex = -1;
+		article.info.title = res.title;
+		article.info.ip = "";
+		article.content = [];
+		article.comment = [];
+		parseArticleInfoAndContent(res, article);
+		parseArticleComment(res, article);
+		// //console.log(article);
+		return article;
 	} catch (err) {
 		return Promise.reject(err);
 	}
 };
 
-const getArticleResponse = async (
-	BotContext,
-	newArticleContent,
-	criteria
-) => {
-	// we should still use id.
-	// 置底文例外處理
+const getArticleResponse = async (BotContext, article) => {
 	let query = BotContext.bot
 		.select(ArticleModel)
-		.where("boardname", newArticleContent.info.boardname)
-		.where("id", newArticleContent.info.id);
-		if (criteria.title) query.where("title", criteria.title);
-		if (criteria.author) query.where("author", criteria.author);
-		if (criteria.push) query.where("push", criteria.push);
+		.where("boardname", article.info.boardname)
+		.where("author", article.info.author)
+		.where("title", article.info.title);
+	console.log("q", query);
+
 	let res = await BotContext.executeCommand({
-		type: 'content',
+		type: "content",
 		arg: query
 	});
 	if (!res) return Promise.reject("getArticleResponse err.");
@@ -68,13 +134,13 @@ const getArticleResponse = async (
 };
 
 // Start from top.
-const parseArticleInfoAndContent = (res, newArticleContent) => {
+const parseArticleInfoAndContent = (res, article) => {
 	let content = res.content;
 	// content starts from index 4
 	for (let i = 4; i < content.length; i++) {
 		let s = content[i].str;
 		if (s.startsWith("※ 發信站: 批踢踢實業坊(ptt.cc)")) {
-			newArticleContent.info.ip = s.substring(27);
+			article.info.ip = s.substring(27);
 			// next line should be "※ 文章網址: https://www.ptt.cc/bbs/Test/M.1588897271.A.57F.html"
 			if (
 				i + 1 < content.length &&
@@ -84,26 +150,26 @@ const parseArticleInfoAndContent = (res, newArticleContent) => {
 				let aidLine = content[++i].str;
 				let url = aidLine.substring(aidLine.indexOf(":") + 2);
 				const [board, AID] = URL2AID(url);
-				newArticleContent.info.aid = AID;
-				newArticleContent.info.commentStartIndex = i + 1;
+				article.info.aid = AID;
+				article.info.commentStartIndex = i + 1;
 				break;
-			}	
+			}
 		} else {
-			newArticleContent.content.push(s);
+			article.content.push(s);
 		}
 	}
 };
 // Starts from top.
 // Todo : check commentStartIndex is correct.
-const parseArticleComment = (res, newArticleContent) => {
-	if (newArticleContent.info.commentStartIndex === -1) return;
+const parseArticleComment = (res, article) => {
+	if (article.info.commentStartIndex === -1) return;
 
 	let content = res.content;
 	// clear all comment
-	newArticleContent.comment = [];
+	article.comment = [];
 
 	for (
-		var i = newArticleContent.info.commentStartIndex, floor = 1;
+		var i = article.info.commentStartIndex, floor = 1;
 		i < content.length;
 		i++
 	) {
@@ -123,26 +189,18 @@ const parseArticleComment = (res, newArticleContent) => {
 		} else {
 			commentLine.text = s;
 		}
-		newArticleContent.comment.push(commentLine);
+		article.comment.push(commentLine);
 	}
 };
 
 // This is used when you already have article.
 // Used in sendComment because we only need to refresh comment.
-const refreshArticleComment = async (
-	BotContext,
-	newArticleContent,
-	criteria
-) => {
-	let res = await getArticleResponse(
-		BotContext,
-		newArticleContent,
-		criteria
-	);
+const refreshArticleComment = async (BotContext, article, criteria) => {
+	let res = await getArticleResponse(BotContext, article, criteria);
 	if (!res) return Promise.reject("refreshArticleComment err");
-	parseArticleComment(res, newArticleContent);
-	//console.log("refresh", newArticleContent.comment);
-	return newArticleContent;
+	parseArticleComment(res, article);
+	//console.log("refresh", article.comment);
+	return article;
 };
 
 // Get articleList based on searching criteria
@@ -159,7 +217,7 @@ const getArticleList = async (BotContext, criteria) => {
 		let query = BotContext.bot
 			.select(ArticleModel)
 			.where("boardname", criteria.boardname);
-		if (criteria.id) query.where('id', criteria.id);
+		if (criteria.id) query.where("id", criteria.id);
 		if (criteria.title) query.where("title", criteria.title);
 		if (criteria.author) query.where("author", criteria.author);
 		if (criteria.push) query.where("push", criteria.push);
@@ -174,29 +232,42 @@ const getArticleList = async (BotContext, criteria) => {
 	}
 };
 
-
-// const getArticleListIterator = async (BotContext, criteria) => {
-// 	try {
-// 		// build query based on criteria
-// 		let query = BotContext.bot
-// 			.select(ArticleModel)
-// 			.where("boardname", criteria.boardname);
-// 		if (criteria.title) query.where("title", criteria.title);
-// 		if (criteria.author) query.where("author", criteria.author);
-// 		if (criteria.push) query.where("push", criteria.push);
-// 		// res will be an iterator
-// 		let res = await BotContext.executeCommand({
-// 			type: "selectIterator",
-// 			arg: query
-// 		});
-// 		return res;
-// 	} catch (err) {
-// 		return Promise.reject(err);
-// 	}
-// };
+// parse article line by line, generate parsed line items.
+const parseArticleLines = (lines, commentStartFloor, index) => {
+	let res = [];
+	for (var i = 0; i < lines.length; i++) {
+		let s = lines[i].str;
+		// comment line
+		if (s.match(/[推噓→]\s+[\w\d]+\s*:.+/)) {
+			// type : '推','噓','→'
+			let commentLine = {
+				type: "",
+				author: "",
+				text: "",
+				timestamp: "",
+				key: index
+			};
+			// todo : check has ip
+			commentLine.floor = commentStartFloor++;
+			commentLine.type = s[0];
+			commentLine.timestamp = s.substring(s.length - 11);
+			let firstColon = s.indexOf(":");
+			commentLine.author = s.substring(2, firstColon);
+			commentLine.text = s.substring(firstColon + 1, s.length - 11);
+			res.push(ArticleCommentItem(commentLine));
+		} else {
+			// not comment line
+			res.push(ArticleContentItem({ text: s, key: index }));
+		}
+		index++;
+	}
+	return [res, commentStartFloor];
+};
 
 export {
 	parseArticle,
 	refreshArticleComment,
 	getArticleList,
+	initArticle,
+	parseArticleLines
 };
