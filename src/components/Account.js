@@ -4,7 +4,6 @@ import Grid from "@material-ui/core/Grid";
 import SettingsIcon from "@material-ui/icons/Settings";
 import { useUserContext } from "./UserContext";
 import { useBotContext } from "./BotContext";
-import Skeleton from "react-loading-skeleton";
 
 export default function Account() {
 	const useStyles = makeStyles(theme => ({

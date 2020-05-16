@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
-import Skeleton from "react-loading-skeleton";
+import Skeleton from '@material-ui/lab/Skeleton';
 import { useUserContext } from "./UserContext";
 import { useBotContext } from "./BotContext";
 import List from "@material-ui/core/List";
@@ -120,7 +120,22 @@ export default function BoardDisplay(props) {
 		<Grid container component="main" className={classes.root}>
 			<Grid item className={classes.skeleton}>
 				{searchBoardText.length === 0 && listItems.length === 0 && (
-					<Skeleton count={6} />
+					<Skeleton/>
+				)}
+				{searchBoardText.length === 0 && listItems.length === 0 && (
+					<Skeleton/>
+				)}
+				{searchBoardText.length === 0 && listItems.length === 0 && (
+					<Skeleton/>
+				)}
+				{searchBoardText.length === 0 && listItems.length === 0 && (
+					<Skeleton/>
+				)}
+				{searchBoardText.length === 0 && listItems.length === 0 && (
+					<Skeleton/>
+				)}
+				{searchBoardText.length === 0 && listItems.length === 0 && (
+					<Skeleton/>
 				)}
 			</Grid>
 			{listItems && <List className={classes.list}> {listItems} </List>}

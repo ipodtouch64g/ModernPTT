@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useCallback } from "react";
-import Skeleton from "react-loading-skeleton";
+import Skeleton from "@material-ui/lab/Skeleton";
 import Grid from "@material-ui/core/Grid";
 import { makeStyles } from "@material-ui/core/styles";
 import { useArticleBoardInfoContext } from "./ArticleBoardInfoContext";
 import { useBotContext } from "./BotContext";
-import CssBaseline from "@material-ui/core/CssBaseline";
 import { Article } from "ptt-client/dist/sites/ptt/model";
 import ArticleItem from "./ArticleItem";
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -23,6 +22,7 @@ import CloseIcon from "@material-ui/icons/Close";
 import Typography from "@material-ui/core/Typography";
 import { getArticleList } from "./utils/article";
 import { useProgressContext } from "./ProgressContext";
+import Slide from "@material-ui/core/Slide";
 
 export default function ArticleSelect(props) {
 	const useStyles = makeStyles(theme => ({
@@ -35,7 +35,11 @@ export default function ArticleSelect(props) {
 		},
 		skeleton: {
 			fontSize: "40px",
-			width: "80%"
+			width: "80%",
+			height: "100%",
+			display: "flex",
+			flexDirection: "column",
+			justifyContent: "center"
 		},
 		info: {
 			position: "absolute",
@@ -90,7 +94,7 @@ export default function ArticleSelect(props) {
 			margin: "24px"
 		},
 		list: {
-			width:'100%',
+			width: "100%"
 		}
 	}));
 
@@ -185,140 +189,141 @@ export default function ArticleSelect(props) {
 			className={classes.root}
 			id="scrollableDiv"
 		>
-			<CssBaseline />
-
-			<Grid
-				item
-				className={classes.skeleton}
-				alignItems="center"
-				justify="center"
-				alignContent="center"
-			>
-				{info.articleList.length === 0 &&
-					(info.haveSelectBoard ? (
-						<Grid container className={classes.skeleton} alignItems="center" justify="center" alignContent='center'>
-						<CircularProgress
-							className={classes.circle}
-							color="secondary"
-						/>
-						</Grid>):
-						<Skeleton count={3} />
-					)
-				}
-			</Grid>
-			{info.articleList.length > 0 && (
-				<Grid container className={classes.list}>
-					<Backdrop
-						className={classes.backdrop}
-						open={isArticleSearchFormOpen}
-						invisible={true}
-					>
-						<ClickAwayListener
-							mouseEvent={
-								isArticleSearchFormOpen ? "onClick" : false
-							}
-							onClickAway={toggleSearchForm}
-						>
-							<Paper elevation={4} className={classes.paper}>
-								<IconButton
-									className={classes.closeIcon}
-									onClick={toggleSearchForm}
-								>
-									<CloseIcon />
-								</IconButton>
-
-								<Typography className={classes.saTitle}>
-									搜尋文章
-								</Typography>
-
-								<Divider
-									className={classes.divider}
-									orientation="horizontal"
-								/>
-								<form
-									onSubmit={handleSubmit(onSubmitSearch)}
-									className={classes.form}
-									noValidate
-									autoComplete="off"
-								>
-									<Controller
-										className={classes.title}
-										as={<TextField label="標題" />}
-										name="title"
-										control={control}
-										defaultValue=""
-									/>
-
-									<Controller
-										className={classes.author}
-										as={<TextField label="作者" />}
-										name="author"
-										control={control}
-										defaultValue=""
-									/>
-
-									<Controller
-										className={classes.push}
-										as={
-											<TextField
-												label="推數(大於多少)"
-												helperText={
-													errors.length > 0
-														? "必須是數字"
-														: ""
-												}
-												error={errors.length > 0}
-											/>
-										}
-										rules={{
-											pattern: {
-												value: /\b\d{0,6}\b/
-											}
-										}}
-										name="push"
-										control={control}
-										defaultValue=""
-									/>
-
-									<Button
-										variant="contained"
-										color="primary"
-										className={classes.button}
-										type="submit"
-									>
-										送出
-									</Button>
-								</form>
-							</Paper>
-						</ClickAwayListener>
-					</Backdrop>
-
-					<Grid item className={classes.info}>
-						看板：{info.boardName}
+			<Slide direction="down" in={info.articleList.length === 0}>
+				{info.articleList.length === 0 ? (
+					<Grid item className={classes.skeleton}>
+						<Skeleton />
+						<Skeleton />
+						<Skeleton />
+						<Skeleton />
+						<Skeleton />
 					</Grid>
+				) : (
+					<div></div>
+				)}
+			</Slide>
 
-					<Fab color="secondary" className={classes.searchFab}>
-						<SearchIcon onClick={toggleSearchForm} />
-					</Fab>
+			<Slide
+				direction="up"
+				in={info.articleList.length > 0}
+				className={classes.list}
+			>
+				{info.articleList.length > 0 ? (
+					<Grid container className={classes.list}>
+						<Backdrop
+							className={classes.backdrop}
+							open={isArticleSearchFormOpen}
+							invisible={true}
+						>
+							<ClickAwayListener
+								mouseEvent={
+									isArticleSearchFormOpen ? "onClick" : false
+								}
+								onClickAway={toggleSearchForm}
+							>
+								<Paper elevation={4} className={classes.paper}>
+									<IconButton
+										className={classes.closeIcon}
+										onClick={toggleSearchForm}
+									>
+										<CloseIcon />
+									</IconButton>
 
-					<InfiniteScroll
-						style={{ overflow: "inherit" }}
-						scrollableTarget="scrollableDiv"
-						dataLength={articleItems.length} //This is important field to render the next data
-						next={handleLoadMore}
-						hasMore={true}
-						loader={
-							<CircularProgress
-								color="secondary"
-								size={12}
-								className={classes.loading}
-							/>
-						}
-					>
-						{articleItems}
-					</InfiniteScroll>
-				</Grid>
-			)}
+									<Typography className={classes.saTitle}>
+										搜尋文章
+									</Typography>
+
+									<Divider
+										className={classes.divider}
+										orientation="horizontal"
+									/>
+									<form
+										onSubmit={handleSubmit(onSubmitSearch)}
+										className={classes.form}
+										noValidate
+										autoComplete="off"
+									>
+										<Controller
+											className={classes.title}
+											as={<TextField label="標題" />}
+											name="title"
+											control={control}
+											defaultValue=""
+										/>
+
+										<Controller
+											className={classes.author}
+											as={<TextField label="作者" />}
+											name="author"
+											control={control}
+											defaultValue=""
+										/>
+
+										<Controller
+											className={classes.push}
+											as={
+												<TextField
+													label="推數(大於多少)"
+													helperText={
+														errors.length > 0
+															? "必須是數字"
+															: ""
+													}
+													error={errors.length > 0}
+												/>
+											}
+											rules={{
+												pattern: {
+													value: /\b\d{0,6}\b/
+												}
+											}}
+											name="push"
+											control={control}
+											defaultValue=""
+										/>
+
+										<Button
+											variant="contained"
+											color="primary"
+											className={classes.button}
+											type="submit"
+										>
+											送出
+										</Button>
+									</form>
+								</Paper>
+							</ClickAwayListener>
+						</Backdrop>
+
+						<Grid item className={classes.info}>
+							看板：{info.boardName}
+						</Grid>
+
+						<Fab color="secondary" className={classes.searchFab}>
+							<SearchIcon onClick={toggleSearchForm} />
+						</Fab>
+
+						<InfiniteScroll
+							style={{ overflow: "inherit" }}
+							scrollableTarget="scrollableDiv"
+							dataLength={articleItems.length} //This is important field to render the next data
+							next={handleLoadMore}
+							hasMore={true}
+							loader={
+								<CircularProgress
+									color="secondary"
+									size={12}
+									className={classes.loading}
+								/>
+							}
+						>
+							{articleItems}
+						</InfiniteScroll>
+					</Grid>
+				) : (
+					<div></div>
+				)}
+			</Slide>
 		</Grid>
 	);
 }
