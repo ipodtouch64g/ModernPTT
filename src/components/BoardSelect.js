@@ -19,7 +19,7 @@ export default function BoardSelect(props) {
 		root: {
 			justifyContent: "center",
 			alignItems: "center",
-			
+			borderBottom : `1px solid ${theme.palette.divider}`,
 		},
 		select: {
 			display: "flex",

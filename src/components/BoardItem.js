@@ -1,18 +1,17 @@
 import React, { useState, useEffect, useCallback } from "react";
 
 import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
-import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import Typography from "@material-ui/core/Typography";
 import { getArticleList } from "./utils/article";
+import { useTheme } from '@material-ui/core/styles';
 
-export default function BoardItem(props) {
+const BoardItem = props => {
 	let item = props.item;
 	let info = props.info;
 	let BotContext = props.BotContext;
-
-	const handleClick = async () => {
+	const theme = useTheme();
+	const handleClick = async e => {
 		//console.log("boardItem click", item, info, BotContext);
 		try {
 			let criteria = { boardname: item.name };
@@ -40,7 +39,17 @@ export default function BoardItem(props) {
 			button
 			onClick={handleClick}
 			key={item.name}
-			style={{ height: "10vh" }}
+			style={{
+				borderLeft: "solid",
+				borderLeftColor:
+					item.users === "爆!"
+						? theme.palette.error.dark
+						: item.users === "HOT"
+						? theme.palette.secondary.dark
+						: theme.palette.primary.dark,
+				borderLeftWidth:'6px',
+			}}
+			divider={true}
 		>
 			<ListItemText
 				primary={<Typography variant="body1">{item.name}</Typography>}
@@ -48,9 +57,9 @@ export default function BoardItem(props) {
 					<Typography variant="body2">{item.title}</Typography>
 				}
 			/>
-			<ListItemIcon style={{ justifyContent: "center" }}>
-				<ChevronRightIcon />
-			</ListItemIcon>
+
 		</ListItem>
 	);
-}
+};
+
+export default BoardItem;

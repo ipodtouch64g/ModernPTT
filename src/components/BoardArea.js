@@ -22,8 +22,6 @@ export default function BoardArea() {
 	const [selectedBoard, setSelectedBoard] = useState("hot");
 	const [searchBoardText, setSearchBoardText] = useState("");
 	return (
-		
-
 		<Grid container component="main" className={classes.root}>
 			<BoardSelect setSelectedBoard = {setSelectedBoard} setSearchBoardText={setSearchBoardText}/>
 			<BoardDisplay selectedBoard={selectedBoard} searchBoardText={searchBoardText} />

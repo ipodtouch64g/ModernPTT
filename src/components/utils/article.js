@@ -2,6 +2,7 @@ import { Article as ArticleModel } from "ptt-client/dist/sites/ptt/model";
 import { URL2AID } from "./decode";
 import ArticleCommentItem from "../ArticleCommentItem";
 import ArticleContentItem from "../ArticleContentItem";
+import React from "react";
 const initArticle = async (articleItem, BotContext) => {
 	try {
 		let article = {
@@ -254,7 +255,7 @@ const parseArticleLines = (lines, commentStartFloor, index) => {
 			let firstColon = s.indexOf(":");
 			commentLine.author = s.substring(2, firstColon);
 			commentLine.text = s.substring(firstColon + 1, s.length - 11);
-			res.push(ArticleCommentItem(commentLine));
+			res.push(<ArticleCommentItem key={index} commentLine={commentLine}/>);
 		} else {
 			// not comment line
 			res.push(ArticleContentItem({ text: s, key: index }));

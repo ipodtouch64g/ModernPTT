@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React from "react";
 
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import Typography from "@material-ui/core/Typography";
-import { parseArticleLines, initArticle } from "./utils/article";
+import { initArticle } from "./utils/article";
 
 export default function ArticleItem(props) {
 	let item = props.item;
@@ -30,9 +30,9 @@ export default function ArticleItem(props) {
 			info.setArticle(article);
 			performance.measure("handleclick", "handleClick");
 			performance.measure("setArticle", "setArticle");
-			performance.getEntriesByType("measure").forEach((e)=>{
+			performance.getEntriesByType("measure").forEach(e => {
 				console.log(e);
-			})
+			});
 			performance.clearMarks();
 			performance.clearMeasures();
 		} catch (err) {
@@ -53,12 +53,32 @@ export default function ArticleItem(props) {
 			>
 				<ListItemText
 					primary={
-						<Typography variant="body2">{item.push}</Typography>
+						<Typography
+							variant="h5"
+							color={
+								Number(item.push) > 50
+									? "error"
+									: Number(item.push) > 10
+									? "secondary"
+									: Number(item.push) > 0
+									? "primary"
+									: "error"
+							}
+						>
+							{item.push}
+						</Typography>
 					}
 				/>
 				{item.status === "R:" && (
 					<ListItemText
-						primary={<Typography variant="body2">RE:</Typography>}
+						primary={
+							<Typography
+								variant="body2"
+								color="textSecondary"
+							>
+								RE:
+							</Typography>
+						}
 						style={{ textAlign: "right" }}
 					/>
 				)}
@@ -78,9 +98,7 @@ export default function ArticleItem(props) {
 				}
 			/>
 
-			<ListItemIcon style={{ justifyContent: "center" }}>
-				<ChevronRightIcon />
-			</ListItemIcon>
+			
 		</ListItem>
 	);
 }

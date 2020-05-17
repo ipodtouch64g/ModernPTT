@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
-import Skeleton from '@material-ui/lab/Skeleton';
+import Skeleton from "@material-ui/lab/Skeleton";
 import { useUserContext } from "./UserContext";
 import { useBotContext } from "./BotContext";
 import List from "@material-ui/core/List";
@@ -27,7 +27,7 @@ export default function BoardDisplay(props) {
 		},
 		list: {
 			padding: "0px",
-			width:"100%"
+			width: "100%"
 		}
 	}));
 	const classes = useStyles();
@@ -44,7 +44,7 @@ export default function BoardDisplay(props) {
 	let searchBoardText = props.searchBoardText;
 
 	// Optimization : 1. Cache all search response.
-	const getBoardCallback = useCallback(async () => {
+	const getBoardCallback = async () => {
 		// if searchBoardText is not empty -> search board with this text
 		// else search based on selectedBoard
 		//console.log("searchCache", searchCache);
@@ -85,8 +85,13 @@ export default function BoardDisplay(props) {
 			if (!res) return false;
 			//console.log(res);
 			// generate list items
-			lis = res.map(item => {
-				return BoardItem({ item, info, BotContext });
+			lis = res.map((item,index) => {
+				return(<BoardItem
+						key={item.name}
+						item = {item}
+						info = {info}
+						BotContext = {BotContext}
+				/>)
 			});
 			let t3 = performance.now();
 			//console.log("map boardItem", t3 - t2);
@@ -103,7 +108,7 @@ export default function BoardDisplay(props) {
 			}
 		}
 		setListItems(lis);
-	}, [BotContext, setListItems, selectedBoard, info, searchBoardText]);
+	};
 
 	useEffect(() => {
 		async function getBoard() {
@@ -120,22 +125,22 @@ export default function BoardDisplay(props) {
 		<Grid container component="main" className={classes.root}>
 			<Grid item className={classes.skeleton}>
 				{searchBoardText.length === 0 && listItems.length === 0 && (
-					<Skeleton/>
+					<Skeleton />
 				)}
 				{searchBoardText.length === 0 && listItems.length === 0 && (
-					<Skeleton/>
+					<Skeleton />
 				)}
 				{searchBoardText.length === 0 && listItems.length === 0 && (
-					<Skeleton/>
+					<Skeleton />
 				)}
 				{searchBoardText.length === 0 && listItems.length === 0 && (
-					<Skeleton/>
+					<Skeleton />
 				)}
 				{searchBoardText.length === 0 && listItems.length === 0 && (
-					<Skeleton/>
+					<Skeleton />
 				)}
 				{searchBoardText.length === 0 && listItems.length === 0 && (
-					<Skeleton/>
+					<Skeleton />
 				)}
 			</Grid>
 			{listItems && <List className={classes.list}> {listItems} </List>}
