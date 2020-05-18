@@ -20,6 +20,8 @@ export default function BoardSelect(props) {
 			justifyContent: "center",
 			alignItems: "center",
 			borderBottom : `1px solid ${theme.palette.divider}`,
+			minHeight:'10vh',
+			alignSelf: 'start',
 		},
 		select: {
 			display: "flex",

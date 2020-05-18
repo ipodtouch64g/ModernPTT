@@ -18,9 +18,8 @@ export default function ArticleSearch(props) {
 		root: {
 			alignItems: "center",
 			justifyContent: "center",
-			maxHeight: "90vh",
-			height: "90vh",
-			overflow: "auto"
+			overflow: "auto",
+			height: "95vh",
 		},
 		skeleton: {
 			fontSize: "40px",

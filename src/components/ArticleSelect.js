@@ -29,14 +29,12 @@ export default function ArticleSelect(props) {
 		root: {
 			alignItems: "center",
 			justifyContent: "center",
-			maxHeight: "90vh",
-			height: "90vh",
-			overflow: "auto"
+			overflow: "auto",
+			height: "95vh",
 		},
 		skeleton: {
 			fontSize: "40px",
 			width: "80%",
-			height: "100%",
 			display: "flex",
 			flexDirection: "column",
 			justifyContent: "center"

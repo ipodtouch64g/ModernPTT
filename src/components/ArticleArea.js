@@ -11,7 +11,8 @@ import ArticleSearch from "./ArticleSearch";
 export default function ArticleArea() {
   const useStyles = makeStyles(theme => ({
 		root: {
-			width:'100%',
+      width:'100%',
+      height:"95vh",
 		},
 
 

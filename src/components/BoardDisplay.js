@@ -16,9 +16,8 @@ export default function BoardDisplay(props) {
 		root: {
 			alignItems: "center",
 			justifyContent: "center",
-			maxHeight: "80vh",
-			height: "80vh",
 			overflow: "auto",
+			height: "85vh",
 			alignContent: "flex-start"
 		},
 		skeleton: {

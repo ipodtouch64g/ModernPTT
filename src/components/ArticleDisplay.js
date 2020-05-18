@@ -17,8 +17,7 @@ export default function ArticleDisplay(props) {
 	const useStyles = makeStyles(theme => ({
 		root: {
 			alignItems: "center",
-			maxHeight: "90vh",
-			height: "90vh",
+			height: "95vh",
 			overflow: "auto"
 		},
 		skeleton: {
