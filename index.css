@@ -1,11 +1,11 @@
 html, body {
   background-color: black;
-  height: 100%;
+  height: 100vh;
   margin: 0;
   padding: 0;
 }
 
 #root {
-  height: 100%;
+  height: 100vh;
   display: flex;
 }
