@@ -2,7 +2,6 @@ import { useState } from "react";
 import constate from "constate";
 import Ptt from "ptt-client";
 import usePrev from "./usePrev";
-import { useProgressContext } from "./ProgressContext";
 
 /* 救命 為啥他有時候會一直亂new 中邪了嗎 也不是斷線阿？ */
 const useBot = () => {
@@ -94,13 +93,6 @@ const useBot = () => {
 				return res;
 			}
 			
-			// // comment in normal mode
-			// if (command.type === "comment") {
-			// 	if (!botState.login) return false;
-			// 	await bot.sendComment(command.arg);
-			// 	busy = false;
-			// 	return true;
-			// }
 
 		} catch(err) {
 			busy = false;

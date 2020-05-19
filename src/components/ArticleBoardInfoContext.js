@@ -1,10 +1,7 @@
 import { useState } from "react";
 import constate from "constate";
-import { Article } from "./utils/article";
-import { useBotContext } from "./BotContext";
 
 const useArticleBoardInfo = () => {
-	const BotContext = useBotContext();
 	const [boardName, setBoardName] = useState("");
 	const [article, setArticle] = new useState({
 		info: {

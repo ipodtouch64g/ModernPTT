@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 
 import Login from "./Login";
-import Account from "./Account";
 
 import BoardArea from "./BoardArea";
 import ArticleArea from "./ArticleArea";
@@ -14,7 +13,6 @@ import { UserProvider } from "./UserContext";
 import { BotProvider } from "./BotContext";
 import { ArticleBoardInfoProvider } from "./ArticleBoardInfoContext";
 import MySnackbar from "./MySnackbar";
-import Hidden from "@material-ui/core/Hidden";
 import { ProgressProvider } from "./ProgressContext";
 import { createMuiTheme, ThemeProvider } from "@material-ui/core";
 import { Resizable } from "re-resizable";

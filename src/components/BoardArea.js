@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 
@@ -18,12 +18,12 @@ export default function BoardArea() {
 		},
 	}));
 	const classes = useStyles();
-	const [selectedBoard, setSelectedBoard] = useState("hot");
+	const [selectedBoard, setSelectedBoard] = useState("");
 	const [searchBoardText, setSearchBoardText] = useState("");
 	return (
 		<Grid container component="main" className={classes.root}>
 			<BoardSelect setSelectedBoard = {setSelectedBoard} setSearchBoardText={setSearchBoardText}/>
-			<BoardDisplay selectedBoard={selectedBoard} searchBoardText={searchBoardText} />
+			<BoardDisplay selectedBoard={selectedBoard} setSelectedBoard = {setSelectedBoard} searchBoardText={searchBoardText} />
 		</Grid>
 	);
 }

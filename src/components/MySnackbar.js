@@ -6,10 +6,8 @@ import Snackbar from "@material-ui/core/Snackbar";
 import { useProgressContext } from "./ProgressContext";
 import MuiAlert from "@material-ui/lab/Alert";
 
-const useStyles = makeStyles(theme => ({}));
 
 export default function MySnackbar() {
-	const classes = useStyles();
 	const {
 		isSnackbarOpen,
 		setIsSnackbarOpen,

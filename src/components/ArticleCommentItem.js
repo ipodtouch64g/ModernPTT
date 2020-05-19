@@ -1,6 +1,7 @@
 import React from "react";
 import { ListItem, ListItemText } from "@material-ui/core";
 import { useTheme } from "@material-ui/core/styles";
+import ArticleText from './ArticleText'
 
  const ArticleCommentItem = (props) => {
     const theme = useTheme();
@@ -32,10 +33,8 @@ import { useTheme } from "@material-ui/core/styles";
 				""
 			)}
 
-			<ListItemText
-				style={{ flexBasis: "65%" }}
-				primary={commentLine.text}
-			/>
+			<ArticleText style={{ flexBasis: "65%" }} maxWidth={"30vw"} text={commentLine.text} key={commentLine.key}/>
+			
 			{commentLine.timestamp ? (
 				<ListItemText
 					style={{ flexBasis: "10%" }}

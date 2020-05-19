@@ -1,5 +1,4 @@
 import { Article as ArticleModel } from "ptt-client/dist/sites/ptt/model";
-import { URL2AID } from "./decode";
 import ArticleCommentItem from "../ArticleCommentItem";
 import ArticleContentItem from "../ArticleContentItem";
 import React from "react";
@@ -77,133 +76,6 @@ const getArticleResponseIterator = async (BotContext, article) => {
 };
 
 
-
-const parseArticle = async (articleItem, BotContext) => {
-	try {
-		let article = {
-			info: {
-				id: "",
-				aid: "",
-				author: "",
-				boardname: "",
-				timestamp: "",
-				commentStartIndex: -1,
-				title: "",
-				ip: ""
-			},
-			content: [],
-			comment: []
-		};
-		article.info.boardname = articleItem.boardname;
-		article.info.id = articleItem.id;
-		article.info.title = articleItem.title;
-		article.info.author = articleItem.author;
-		let res = await getArticleResponse(BotContext, article);
-
-		article.info.aid = "";
-
-		article.info.timestamp = res.timestamp;
-		article.info.commentStartIndex = -1;
-		article.info.title = res.title;
-		article.info.ip = "";
-		article.content = [];
-		article.comment = [];
-		parseArticleInfoAndContent(res, article);
-		parseArticleComment(res, article);
-		// //console.log(article);
-		return article;
-	} catch (err) {
-		return Promise.reject(err);
-	}
-};
-
-const getArticleResponse = async (BotContext, article) => {
-	let query = BotContext.bot
-		.select(ArticleModel)
-		.where("boardname", article.info.boardname)
-		.where("author", article.info.author)
-		.where("title", article.info.title);
-	console.log("q", query);
-
-	let res = await BotContext.executeCommand({
-		type: "content",
-		arg: query
-	});
-	if (!res) return Promise.reject("getArticleResponse err.");
-	console.log(res);
-	return res;
-};
-
-// Start from top.
-const parseArticleInfoAndContent = (res, article) => {
-	let content = res.content;
-	// content starts from index 4
-	for (let i = 4; i < content.length; i++) {
-		let s = content[i].str;
-		if (s.startsWith("※ 發信站: 批踢踢實業坊(ptt.cc)")) {
-			article.info.ip = s.substring(27);
-			// next line should be "※ 文章網址: https://www.ptt.cc/bbs/Test/M.1588897271.A.57F.html"
-			if (
-				i + 1 < content.length &&
-				content[i + 1].str.startsWith("※ 文章網址: ")
-			) {
-				// parse as AID
-				let aidLine = content[++i].str;
-				let url = aidLine.substring(aidLine.indexOf(":") + 2);
-				const [board, AID] = URL2AID(url);
-				article.info.aid = AID;
-				article.info.commentStartIndex = i + 1;
-				break;
-			}
-		} else {
-			article.content.push(s);
-		}
-	}
-};
-// Starts from top.
-// Todo : check commentStartIndex is correct.
-const parseArticleComment = (res, article) => {
-	if (article.info.commentStartIndex === -1) return;
-
-	let content = res.content;
-	// clear all comment
-	article.comment = [];
-
-	for (
-		var i = article.info.commentStartIndex, floor = 1;
-		i < content.length;
-		i++
-	) {
-		let s = content[i].str;
-		// type : '推','噓','→'
-		let commentLine = { type: "", author: "", text: "", timestamp: "" };
-		// find out whether it is a normal comment
-		if (s.match(/[推噓→]\s+[\w\d]+\s*:.+/)) {
-			// todo : check has ip
-
-			commentLine.floor = floor++;
-			commentLine.type = s[0];
-			commentLine.timestamp = s.substring(s.length - 11);
-			let firstColon = s.indexOf(":");
-			commentLine.author = s.substring(2, firstColon);
-			commentLine.text = s.substring(firstColon + 1, s.length - 11);
-		} else {
-			commentLine.text = s;
-		}
-		article.comment.push(commentLine);
-	}
-};
-
-// This is used when you already have article.
-// Used in sendComment because we only need to refresh comment.
-const refreshArticleComment = async (BotContext, article, criteria) => {
-	let res = await getArticleResponse(BotContext, article, criteria);
-	if (!res) return Promise.reject("refreshArticleComment err");
-	parseArticleComment(res, article);
-	//console.log("refresh", article.comment);
-	return article;
-};
-
 // Get articleList based on searching criteria
 // criteria = { boardname:'',
 //  			title:'',
@@ -211,7 +83,6 @@ const refreshArticleComment = async (BotContext, article, criteria) => {
 //    			push:'',
 //				id:'',
 // 			  }
-
 const getArticleList = async (BotContext, criteria) => {
 	try {
 		// build query based on criteria
@@ -266,8 +137,6 @@ const parseArticleLines = (lines, commentStartFloor, index) => {
 };
 
 export {
-	parseArticle,
-	refreshArticleComment,
 	getArticleList,
 	initArticle,
 	parseArticleLines

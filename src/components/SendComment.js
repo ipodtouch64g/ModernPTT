@@ -16,7 +16,6 @@ import { useForm, Controller } from "react-hook-form";
 import InputLabel from "@material-ui/core/InputLabel";
 import { CircularProgress } from "@material-ui/core";
 
-import { refreshArticleComment } from "./utils/article";
 export default function SendComment(props) {
 	const useStyles = makeStyles(theme => ({
 		root: {
