@@ -1,11 +1,11 @@
 import React from "react";
 import { ListItem, ListItemText } from "@material-ui/core";
 import { useTheme } from "@material-ui/core/styles";
-import ArticleText from './ArticleText'
+import ArticleText from "./ArticleText";
 
- const ArticleCommentItem = (props) => {
-    const theme = useTheme();
-    let commentLine = props.commentLine;
+const ArticleCommentItem = props => {
+	const theme = useTheme();
+	let commentLine = props.commentLine;
 	return (
 		<ListItem disableGutters={true} divider={true} key={commentLine.key}>
 			{commentLine.type ? (
@@ -19,7 +19,7 @@ import ArticleText from './ArticleText'
 								? theme.palette.primary.dark
 								: theme.palette.secondary.dark
 					}}
-                    primary={commentLine.type}
+					primary={commentLine.type}
 				/>
 			) : (
 				""
@@ -32,9 +32,13 @@ import ArticleText from './ArticleText'
 			) : (
 				""
 			)}
+			<ListItemText style={{ flexBasis: "65%" }}>
+				<ArticleText
+					text={commentLine.text}
+					key={commentLine.key}
+				/>
+			</ListItemText>
 
-			<ArticleText style={{ flexBasis: "65%" }} maxWidth={"30vw"} text={commentLine.text} key={commentLine.key}/>
-			
 			{commentLine.timestamp ? (
 				<ListItemText
 					style={{ flexBasis: "10%" }}
@@ -46,5 +50,5 @@ import ArticleText from './ArticleText'
 			)}
 		</ListItem>
 	);
-}
-export default ArticleCommentItem
+};
+export default ArticleCommentItem;

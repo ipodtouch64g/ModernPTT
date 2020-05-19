@@ -3,7 +3,6 @@ import { ListItem, ListItemText } from "@material-ui/core";
 import Image from "material-ui-image";
 
 export default function ArticleText(props) {
-
 	const text = props.text;
 	const maxWidth = props.maxWidth;
 	let t = text;
@@ -19,7 +18,7 @@ export default function ArticleText(props) {
 	if (url) {
 		let hyperlink = (
 			<a
-				style={{ color: "#ffffff", marginLeft: '-4px' }}
+				style={{ color: "#ffffff", marginLeft: "-4px" }}
 				href={url[0]}
 				target="_blank"
 				rel="noopener noreferrer"
@@ -54,7 +53,8 @@ export default function ArticleText(props) {
 					whiteSpace: "pre",
 					display: "flex",
 					flexDirection: "column",
-					width: maxWidth,
+					minHeight: "100%",
+					minWidth: "100%",
 					overflow: "hidden",
 					height: "auto",
 					alignItems: "flex-start"
@@ -63,19 +63,25 @@ export default function ArticleText(props) {
 				{ti}
 				<Image
 					style={{
-						backgroundColor: "none"
+                        backgroundColor: "none",
+                        paddingTop:'0',
 					}}
-					imageStyle={{ width: maxWidth, height: "auto" }}
+					imageStyle={{
+						display: "block",
+                        height: 'auto',
+                        top:'0',
+                        left:'0',
+                        position:'relative',
+                        width: '100%',
+                       
+					}}
 					src={img}
 				/>
 			</ListItem>
 		);
 	} else {
 		return (
-			<ListItem
-				disableGutters={true}
-				style={{ whiteSpace: "pre" }}
-			>
+			<ListItem disableGutters={true} style={{ whiteSpace: "pre" }}>
 				{ti}
 			</ListItem>
 		);
