@@ -26,13 +26,13 @@ const ArticleCommentItem = props => {
 			)}
 			{commentLine.author ? (
 				<ListItemText
-					style={{ flexBasis: "20%" }}
+					style={{ flexBasis: "15%" }}
 					primary={commentLine.author}
 				/>
 			) : (
 				""
 			)}
-			<ListItemText style={{ flexBasis: "65%" }}>
+			<ListItemText style={{ flexBasis: "70%" }}>
 				<ArticleText
 					text={commentLine.text}
 					key={commentLine.key}

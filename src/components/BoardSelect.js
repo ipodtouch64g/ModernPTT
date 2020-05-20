@@ -17,11 +17,14 @@ export default function BoardSelect(props) {
 			width: "80%"
 		},
 		root: {
-			justifyContent: "center",
-			alignItems: "center",
-			borderBottom : `1px solid ${theme.palette.divider}`,
-			minHeight:'10vh',
-			alignSelf: 'start',
+			height:'48px',
+			top:0,
+			left:0,
+			position:'absolute',
+			zIndex:'999999',
+			borderBottom:'1px solid rgba(255, 255, 255, 0.12)',
+			alignItems:'center',
+			justifyContent:'center',
 		},
 		select: {
 			display: "flex",

@@ -48,6 +48,7 @@ const BoardItem = props => {
 						? theme.palette.secondary.dark
 						: theme.palette.primary.dark,
 				borderLeftWidth:'6px',
+				height: '10vh'
 			}}
 			divider={true}
 		>

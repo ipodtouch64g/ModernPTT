@@ -12,11 +12,11 @@ import { Board } from "ptt-client/dist/sites/ptt/model";
 export default function BoardDisplay(props) {
 	const useStyles = makeStyles(theme => ({
 		root: {
-			alignItems: "center",
-			justifyContent: "center",
+			height: 'calc(100% - 48px)',
 			overflow: "auto",
-			height: "85vh",
-			alignContent: "flex-start"
+			marginTop:'48px',
+			alignItems:'center',
+			justifyContent:'center',
 		},
 		skeleton: {
 			fontSize: "40px",

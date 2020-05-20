@@ -20,18 +20,6 @@ import { Resizable } from "re-resizable";
 import { colors } from "@material-ui/core";
 
 const theme = createMuiTheme({
-	typography: {
-		body1: {
-			fontSize: "0.8rem"
-		},
-		body2: {
-			fontSize: "0.65rem"
-		},
-		h5: {
-			fontSize: "1rem",
-			fontWeight: "bold"
-		}
-	},
 	palette: {
 		type: "dark",
 		primary: {
@@ -86,7 +74,7 @@ export default function Main() {
 								<Grid item className={classes.resizable}>
 									<Resizable
 										defaultSize={{
-											width: "25vw",
+											width: "20vw",
 											height: "95vh"
 										}}
 										enable={{
