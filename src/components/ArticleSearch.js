@@ -16,8 +16,7 @@ import { getArticleList } from "./utils/article";
 export default function ArticleSearch(props) {
 	const useStyles = makeStyles(theme => ({
 		root: {
-			alignItems: "center",
-			justifyContent: "center",
+			
 			overflow: "auto",
 			height: "95vh",
 		},
@@ -61,11 +60,11 @@ export default function ArticleSearch(props) {
 		if (info.articleSearchList.length > 0) {
 			// generate list items
 			let res = info.articleSearchList.map(item => {
-				return ArticleItem({
-					item,
-					info,
-					BotContext
-				});
+				return <ArticleItem
+					item={item}
+					info={info}
+					BotContext={BotContext}
+				/>
 			});
 
 			setArticleItems(res);

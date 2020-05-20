@@ -20,7 +20,7 @@ import Divider from "@material-ui/core/Divider";
 import Button from "@material-ui/core/Button";
 import CloseIcon from "@material-ui/icons/Close";
 import Typography from "@material-ui/core/Typography";
-import { getArticleList } from "./utils/article";
+import { submitSearch } from "./utils/search";
 import { useProgressContext } from "./ProgressContext";
 import Slide from "@material-ui/core/Slide";
 
@@ -30,7 +30,7 @@ export default function ArticleSelect(props) {
 			alignItems: "center",
 			justifyContent: "center",
 			overflow: "auto",
-			height: "95vh",
+			height: "95vh"
 		},
 		skeleton: {
 			fontSize: "40px",
@@ -111,7 +111,13 @@ export default function ArticleSelect(props) {
 		if (info.articleList.length > 0) {
 			// generate list items
 			let res = info.articleList.map(item => {
-				return ArticleItem({ item, info, BotContext });
+				return (
+					<ArticleItem
+						item={item}
+						info={info}
+						BotContext={BotContext}
+					/>
+				);
 			});
 			setArticleItems(res);
 		}
@@ -125,30 +131,22 @@ export default function ArticleSelect(props) {
 	const { handleSubmit, control, errors } = useForm();
 
 	const onSubmitSearch = async values => {
-		//console.log(values);
-		// search for matching articles
-		let criteria = {
-			boardname: info.boardName,
-			title: values.title,
-			author: values.author,
-			push: values.push
-		};
-		info.setCriteria(criteria);
 		try {
-			let res = await getArticleList(BotContext, criteria);
-			console.log(res);
-			if (res.length > 0) {
-				info.setArticleSearchList(res);
-				info.setIndex(1);
-			} else {
+			if (
+				await !submitSearch(
+					{ ...values, boardname: info.boardName },
+					info,
+					BotContext
+				)
+			) {
 				setIsSnackbarOpen(true);
 				setSnackbarContent({
 					severity: "error",
 					text: "搜尋不到東西！"
 				});
-				info.setCriteria({});
+			} else {
+				toggleSearchForm();
 			}
-			toggleSearchForm();
 		} catch (err) {
 			console.error(err);
 		}
