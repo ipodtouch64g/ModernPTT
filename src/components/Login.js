@@ -14,7 +14,10 @@ import { useUserContext } from "./UserContext";
 import { useBotContext } from "./BotContext";
 import { useProgressContext } from "./ProgressContext";
 import { CircularProgress } from "@material-ui/core";
-
+import Link from "@material-ui/core/Link";
+import Card from "@material-ui/core/Card";
+import CardActions from "@material-ui/core/CardActions";
+import CardContent from "@material-ui/core/CardContent";
 import { useForm } from "react-hook-form";
 import Cookies from "universal-cookie";
 
@@ -43,15 +46,15 @@ const useStyles = makeStyles(theme => ({
 		zIndex: theme.zIndex.drawer + 2
 	},
 	paperreconnect: {
-		padding:"12px",
+		padding: "12px",
 		minWidth: "20vw",
 		height: "15vh",
 		display: "flex",
-		flexDirection: "column",
+		flexDirection: "column"
 	},
-	reconnectText:{},
-	reconnectButton:{
-		alignSelf:"flex-end"
+	reconnectText: {},
+	reconnectButton: {
+		alignSelf: "flex-end"
 	},
 	form: {
 		width: "80%",
@@ -69,6 +72,9 @@ const useStyles = makeStyles(theme => ({
 	},
 	circle: {
 		marginRight: "9px"
+	},
+	installExtension: {
+		width: "400px"
 	}
 }));
 
@@ -122,7 +128,7 @@ export default function Login() {
 	);
 	const handleReconnect = () => {
 		BotContext.bot.reconnect();
-	}
+	};
 	const [openBackDrop, setOpenBackDrop] = useState(!user);
 	const [openLoadingCircle, setOpenLoadingCircle] = useState(false);
 	const [openForm, setOpenForm] = useState(true);
@@ -132,7 +138,7 @@ export default function Login() {
 		async function tryLogin() {
 			await loginCallback(user);
 		}
-		//console.log("botState:", BotContext.botState);
+		console.log("botState:", BotContext.botState);
 		//console.log("prev botState:", BotContext.prevBotState);
 		if (user) {
 			if (BotContext.prevBotState === undefined) return;
@@ -175,15 +181,55 @@ export default function Login() {
 					<CssBaseline />
 					{openReconnect && (
 						<Paper className={classes.paperreconnect}>
-							<Typography variant="body1" className={classes.reconnectText}>您斷線了</Typography>
-							<Button variant="contained" color="secondary" className={classes.reconnectButton} onClick={handleReconnect}>
+							<Typography
+								variant="body1"
+								className={classes.reconnectText}
+							>
+								您斷線了
+							</Typography>
+							<Button
+								variant="contained"
+								color="secondary"
+								className={classes.reconnectButton}
+								onClick={handleReconnect}
+							>
 								重新連線
 							</Button>
 						</Paper>
 					)}
-					{openForm && (
+
+					{BotContext.botState.wsError && (
+						<Card className={classes.installExtension}>
+							<CardContent>
+								<Typography variant="h5" component="h2" gutterBottom>
+									尚未安裝插件
+								</Typography>
+								<Typography variant="body1" component="p">
+									因為技術問題，目前只能先請您安裝
+									<Link href="https://github.com/ipodtouch64g/pass-thorugh-ptt-wall-wss">
+										穿牆插件
+									</Link>
+									<span role="img" aria-label="Person Bowing">
+										🙇
+									</span>{" "}
+								</Typography>
+								<Typography variant="body2" component="p">
+									(PTT的WebSocket只容許特定Origin，瀏覽器不支援custom
+									header
+									<span
+										role="img"
+										aria-label="Loudly Crying Face"
+									>
+										😭
+									</span>{" "}
+									)
+								</Typography>
+							</CardContent>
+						</Card>
+					)}
+
+					{!BotContext.botState.wsError && openForm && (
 						<Paper className={classes.paperform}>
-							{/* <Avatar variant="square" className={classes.large} src="logo.png"/> */}
 							<Typography
 								component="h4"
 								variant="h5"
