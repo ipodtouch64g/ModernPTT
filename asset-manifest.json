@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/ModernPTT/static/css/main.d498bfb3.chunk.css",
-    "main.js": "/ModernPTT/static/js/main.e3e67d73.chunk.js",
-    "main.js.map": "/ModernPTT/static/js/main.e3e67d73.chunk.js.map",
+    "main.js": "/ModernPTT/static/js/main.7a3adbc3.chunk.js",
+    "main.js.map": "/ModernPTT/static/js/main.7a3adbc3.chunk.js.map",
     "runtime-main.js": "/ModernPTT/static/js/runtime-main.9b62de90.js",
     "runtime-main.js.map": "/ModernPTT/static/js/runtime-main.9b62de90.js.map",
     "static/js/2.20261103.chunk.js": "/ModernPTT/static/js/2.20261103.chunk.js",
     "static/js/2.20261103.chunk.js.map": "/ModernPTT/static/js/2.20261103.chunk.js.map",
     "index.html": "/ModernPTT/index.html",
-    "precache-manifest.06dcf32521e249c57bda5fcb7adce2d5.js": "/ModernPTT/precache-manifest.06dcf32521e249c57bda5fcb7adce2d5.js",
+    "precache-manifest.03153371443bc4eadcea38b76cdcf7b6.js": "/ModernPTT/precache-manifest.03153371443bc4eadcea38b76cdcf7b6.js",
     "service-worker.js": "/ModernPTT/service-worker.js",
     "static/css/main.d498bfb3.chunk.css.map": "/ModernPTT/static/css/main.d498bfb3.chunk.css.map",
     "static/js/2.20261103.chunk.js.LICENSE.txt": "/ModernPTT/static/js/2.20261103.chunk.js.LICENSE.txt"
@@ -17,6 +17,6 @@
     "static/js/runtime-main.9b62de90.js",
     "static/js/2.20261103.chunk.js",
     "static/css/main.d498bfb3.chunk.css",
-    "static/js/main.e3e67d73.chunk.js"
+    "static/js/main.7a3adbc3.chunk.js"
   ]
 }
