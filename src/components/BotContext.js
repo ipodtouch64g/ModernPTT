@@ -1,7 +1,6 @@
 import { useState } from "react";
 import constate from "constate";
 import Ptt from "ptt-client";
-import usePrev from "./usePrev";
 
 const useBot = () => {
 	
@@ -9,7 +8,6 @@ const useBot = () => {
 	const [bot] = useState(new Ptt());
 	
 	const [botState, setBotState] = useState(bot.state);
-	const prevBotState = usePrev(botState);
 
 	bot.on("connect", () => {
 		//console.log("bot connected");
@@ -106,7 +104,6 @@ const useBot = () => {
 	return {
 		bot: bot,
 		botState: botState,
-		prevBotState: prevBotState,
 		executeCommand: executeCommand
 	};
 };

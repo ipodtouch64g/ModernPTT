@@ -116,7 +116,7 @@ export default function Login() {
 				//console.log("login fail");
 				setSnackbarContent({
 					severity: "error",
-					text: "帳密輸入錯誤！！"
+					text: "帳密輸入錯誤"
 				});
 				setIsSnackbarOpen(true);
 				setOpenForm(true);
@@ -127,7 +127,7 @@ export default function Login() {
 		[BotContext]
 	);
 	const handleReconnect = () => {
-		BotContext.bot.reconnect();
+		window.location.reload();
 	};
 	const [openBackDrop, setOpenBackDrop] = useState(!user);
 	const [openLoadingCircle, setOpenLoadingCircle] = useState(false);
@@ -139,17 +139,16 @@ export default function Login() {
 			await loginCallback(user);
 		}
 		console.log("botState:", BotContext.botState);
-		//console.log("prev botState:", BotContext.prevBotState);
 		if (user) {
-			if (BotContext.prevBotState === undefined) return;
+			if (BotContext.botState === undefined) return;
 			if (
 				BotContext.botState.connect &&
-				!BotContext.prevBotState.connect
+				!BotContext.botState.login
 			) {
 				setOpenReconnect(false);
 				tryLogin();
 			} else if (
-				BotContext.prevBotState.connect &&
+				BotContext.botState.login &&
 				!BotContext.botState.connect
 			) {
 				// disconnected
@@ -157,7 +156,7 @@ export default function Login() {
 				setOpenReconnect(true);
 			}
 		}
-	}, [user, BotContext.botState, BotContext.prevBotState, loginCallback]);
+	}, [user, BotContext.botState,loginCallback]);
 
 	return (
 		<Grid container component="main" className={classes.root}>
@@ -198,7 +197,7 @@ export default function Login() {
 						</Paper>
 					)}
 
-					{BotContext.botState.wsError && (
+					{BotContext.botState.wsState === -1 && (
 						<Card className={classes.installExtension}>
 							<CardContent>
 								<Typography variant="h5" component="h2" gutterBottom>
@@ -228,7 +227,7 @@ export default function Login() {
 						</Card>
 					)}
 
-					{!BotContext.botState.wsError && openForm && (
+					{BotContext.botState.wsState === 1 && openForm && (
 						<Paper className={classes.paperform}>
 							<Typography
 								component="h4"

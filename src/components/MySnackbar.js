@@ -26,7 +26,7 @@ export default function MySnackbar() {
 	return (
 		<Snackbar
 			open={isSnackbarOpen}
-			autoHideDuration={1000}
+			autoHideDuration={3000}
 			onClose={handleErrorBarClose}
 		>
 			<Alert severity={snackbarContent.severity}>
