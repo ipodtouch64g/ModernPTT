@@ -3,7 +3,6 @@ import constate from "constate";
 import Ptt from "ptt-client";
 import usePrev from "./usePrev";
 
-/* 救命 為啥他有時候會一直亂new 中邪了嗎 也不是斷線阿？ */
 const useBot = () => {
 	
 	console.info('new useBot()')
@@ -12,16 +11,19 @@ const useBot = () => {
 	const [botState, setBotState] = useState(bot.state);
 	const prevBotState = usePrev(botState);
 
-	// const { setIsSnackbarOpen, setSnackbarContent } = useProgressContext();
-
 	bot.on("connect", () => {
 		//console.log("bot connected");
-		setBotState(bot.state);
+		setBotState({...bot.state});
 	});
 
 	bot.on("disconnect", () => {
 		//console.log("bot disconnected");
-		setBotState(bot.state);
+		setBotState({...bot.state});
+	});
+
+	bot.on("websocket_error", () => {
+		console.log("websocket_error");
+		setBotState({...bot.state});
 	});
 
 	let busy = false;
@@ -67,6 +69,7 @@ const useBot = () => {
 				busy = false;
 				return res;
 			}
+
 			// articleList
 			if (command.type === "select") {
 				if (!botState.login) return false;
@@ -104,7 +107,6 @@ const useBot = () => {
 		bot: bot,
 		botState: botState,
 		prevBotState: prevBotState,
-		setBotState: setBotState,
 		executeCommand: executeCommand
 	};
 };
